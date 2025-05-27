@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +10,7 @@ import { EnhancedNavigation } from "./components/ui/enhanced-navigation";
 import Dashboard from "./pages/Dashboard";
 import FleetManagement from "./pages/FleetManagement";
 import Estimates from "./pages/Estimates";
+import EstimatesManagement from "./pages/EstimatesManagement";
 import Jobs from "./pages/Jobs";
 import Invoices from "./pages/Invoices";
 import NotFound from "./pages/NotFound";
@@ -37,6 +37,7 @@ const App = () => (
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/fleet" element={<FleetManagement />} />
                   <Route path="/estimates" element={<Estimates />} />
+                  <Route path="/estimates-management" element={<EstimatesManagement />} />
                   <Route path="/jobs" element={<Jobs />} />
                   <Route path="/invoices" element={<Invoices />} />
                   <Route path="/settings" element={<div className="p-6"><h1 className="text-2xl font-bold">Settings - Coming Soon</h1></div>} />
