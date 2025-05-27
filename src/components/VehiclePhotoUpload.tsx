@@ -68,10 +68,13 @@ export const VehiclePhotoUpload = ({ vehicleId }: VehiclePhotoUploadProps) => {
       // Save photo record to database
       const { data, error } = await supabase
         .from('vehicle_photos')
-        .insert([{
-          ...photoData,
-          photo_url: urlData.publicUrl
-        }])
+        .insert({
+          vehicle_id: vehicleId,
+          photo_url: urlData.publicUrl,
+          description: photoData.description || null,
+          photo_type: photoData.photo_type || 'general',
+          uploaded_by: (await supabase.auth.getUser()).data.user?.id || null
+        })
         .select()
         .single();
 
@@ -121,10 +124,8 @@ export const VehiclePhotoUpload = ({ vehicleId }: VehiclePhotoUploadProps) => {
     if (!selectedFile) return;
 
     const photoData = {
-      vehicle_id: vehicleId,
       description: formData.get('description') as string,
-      photo_type: formData.get('photo_type') as VehiclePhoto['photo_type'],
-      uploaded_by: (await supabase.auth.getUser()).data.user?.id
+      photo_type: formData.get('photo_type') as VehiclePhoto['photo_type']
     };
 
     uploadPhotoMutation.mutate({ file: selectedFile, photoData });
@@ -134,8 +135,11 @@ export const VehiclePhotoUpload = ({ vehicleId }: VehiclePhotoUploadProps) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.capture = 'environment';
-    input.onchange = handleFileSelect;
+    input.setAttribute('capture', 'environment');
+    input.onchange = (e) => {
+      const event = e as unknown as React.ChangeEvent<HTMLInputElement>;
+      handleFileSelect(event);
+    };
     input.click();
   };
 
