@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,6 +24,7 @@ import DocumentManagement from "./pages/DocumentManagement";
 import TimeTracking from "./pages/TimeTracking";
 import RealTimeGPS from "./pages/RealTimeGPS";
 import NotFound from "./pages/NotFound";
+import { MobileOptimizedLayout } from "./components/mobile/MobileOptimizedLayout";
 
 const queryClient = new QueryClient();
 
@@ -37,34 +37,36 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <ProtectedRoute>
-              <div className="min-h-screen bg-background text-foreground">
-                <EnhancedNavigation 
-                  variant="premium"
-                  showThemeControls={true}
-                  enableAnimations={true}
-                />
-                <Routes>
-                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/fleet" element={<FleetManagement />} />
-                  <Route path="/estimates" element={<Estimates />} />
-                  <Route path="/estimates-management" element={<EstimatesManagement />} />
-                  <Route path="/jobs" element={<Jobs />} />
-                  <Route path="/invoices" element={<Invoices />} />
-                  <Route path="/financial" element={<FinancialManagement />} />
-                  <Route path="/crm" element={<CRM />} />
-                  <Route path="/inventory" element={<InventoryManagement />} />
-                  <Route path="/safety" element={<SafetyCompliance />} />
-                  <Route path="/maintenance" element={<MaintenanceTracking />} />
-                  <Route path="/mapping" element={<AdvancedMapping />} />
-                  <Route path="/scheduling" element={<Scheduling />} />
-                  <Route path="/documents" element={<DocumentManagement />} />
-                  <Route path="/time-tracking" element={<TimeTracking />} />
-                  <Route path="/gps" element={<RealTimeGPS />} />
-                  <Route path="/settings" element={<div className="p-6"><h1 className="text-2xl font-bold">Settings - Coming Soon</h1></div>} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </div>
+              <MobileOptimizedLayout>
+                <div className="min-h-screen bg-background text-foreground">
+                  <EnhancedNavigation 
+                    variant="premium"
+                    showThemeControls={true}
+                    enableAnimations={true}
+                  />
+                  <Routes>
+                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/fleet" element={<FleetManagement />} />
+                    <Route path="/estimates" element={<Estimates />} />
+                    <Route path="/estimates-management" element={<EstimatesManagement />} />
+                    <Route path="/jobs" element={<Jobs />} />
+                    <Route path="/invoices" element={<Invoices />} />
+                    <Route path="/financial" element={<FinancialManagement />} />
+                    <Route path="/crm" element={<CRM />} />
+                    <Route path="/inventory" element={<InventoryManagement />} />
+                    <Route path="/safety" element={<SafetyCompliance />} />
+                    <Route path="/maintenance" element={<MaintenanceTracking />} />
+                    <Route path="/mapping" element={<AdvancedMapping />} />
+                    <Route path="/scheduling" element={<Scheduling />} />
+                    <Route path="/documents" element={<DocumentManagement />} />
+                    <Route path="/time-tracking" element={<TimeTracking />} />
+                    <Route path="/gps" element={<RealTimeGPS />} />
+                    <Route path="/settings" element={<div className="p-6"><h1 className="text-2xl font-bold">Settings - Coming Soon</h1></div>} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </div>
+              </MobileOptimizedLayout>
             </ProtectedRoute>
           </BrowserRouter>
         </TooltipProvider>

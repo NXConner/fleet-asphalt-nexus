@@ -8,13 +8,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardOverview } from "@/components/dashboard/DashboardOverview";
 import { DashboardFleet } from "@/components/dashboard/DashboardFleet";
 import { DashboardOptimization } from "@/components/dashboard/DashboardOptimization";
+import { EnhancedDashboard } from "@/components/dashboard/EnhancedDashboard";
+import { MobileDashboard } from "@/components/mobile/MobileDashboard";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { mockStats } from "@/data/mockStats";
 
 const Dashboard = () => {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <div className="container mx-auto px-4 py-4">
+        <MobileDashboard />
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Integrated Dashboard</h1>
+        <h1 className="text-3xl font-bold">Fleet Asphalt Nexus</h1>
         <p className="text-muted-foreground mt-2">
           Complete overview of your asphalt business operations and fleet management
         </p>
@@ -22,17 +35,21 @@ const Dashboard = () => {
 
       <StatsGrid stats={mockStats} />
 
-      <Tabs defaultValue="overview" className="mt-8">
+      <Tabs defaultValue="enhanced" className="mt-8">
         <TabsList className="grid w-full grid-cols-7">
+          <TabsTrigger value="enhanced">Enhanced</TabsTrigger>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="fleet">Fleet Management</TabsTrigger>
           <TabsTrigger value="fleet-focus">Fleet Focus</TabsTrigger>
           <TabsTrigger value="tracking">Employee Tracking</TabsTrigger>
           <TabsTrigger value="optimization">Optimization</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
-          <TabsTrigger value="themes">Themes</TabsTrigger>
         </TabsList>
         
+        <TabsContent value="enhanced" className="mt-6">
+          <EnhancedDashboard />
+        </TabsContent>
+
         <TabsContent value="overview" className="mt-6">
           <DashboardOverview />
         </TabsContent>
@@ -55,10 +72,6 @@ const Dashboard = () => {
 
         <TabsContent value="reports" className="mt-6">
           <UnifiedReports />
-        </TabsContent>
-
-        <TabsContent value="themes" className="mt-6">
-          <DashboardThemeIntegration />
         </TabsContent>
       </Tabs>
     </div>
