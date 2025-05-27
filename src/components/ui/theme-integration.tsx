@@ -108,7 +108,7 @@ export function ThemeIntegration({
       {effects.particles && (
         <ParticleSystem 
           variant="cosmic" 
-          density="low" 
+          density="sparse" 
           speed="slow" 
           connections={false}
         />
