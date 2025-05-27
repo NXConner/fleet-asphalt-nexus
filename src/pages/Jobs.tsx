@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, MapPin, Calendar, BarChart3 } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { CreateJobForm } from "@/components/CreateJobForm";
+import CreateJobForm from "@/components/CreateJobForm";
 import { toast } from "sonner";
 
 const Jobs = () => {
