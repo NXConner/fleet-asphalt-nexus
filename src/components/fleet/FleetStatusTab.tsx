@@ -2,26 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Truck, MapPin, Fuel, Activity, Clock, Route } from "lucide-react";
-
-interface FleetVehicle {
-  id: string;
-  name: string;
-  type: 'truck' | 'van' | 'trailer' | 'equipment';
-  status: 'active' | 'inactive' | 'maintenance' | 'out-of-service';
-  location: {
-    lat: number;
-    lng: number;
-    address: string;
-    lastUpdate: string;
-  };
-  driver?: string;
-  fuelLevel: number;
-  mileage: number;
-  maintenanceScore: number;
-  route?: string;
-  speed: number;
-  engineHours: number;
-}
+import { FleetVehicle } from "@/types/fleetTypes";
 
 interface FleetStatusTabProps {
   vehicles: FleetVehicle[];

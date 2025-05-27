@@ -3,16 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Route, MapPin, Clock, DollarSign, TrendingUp } from "lucide-react";
-
-interface RouteOptimization {
-  id: string;
-  name: string;
-  vehicles: string[];
-  totalDistance: number;
-  estimatedTime: number;
-  fuelCost: number;
-  efficiency: number;
-}
+import { RouteOptimization } from "@/types/fleetTypes";
 
 interface FleetRoutesTabProps {
   routes: RouteOptimization[];

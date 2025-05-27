@@ -1,10 +1,11 @@
 
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Truck } from "lucide-react";
 import { VehicleMetrics } from "@/types/fleetTypes";
 
-interface VehicleSelectorProps {
+interface OptimizedVehicleSelectorProps {
   vehicles: VehicleMetrics[];
   selectedVehicle: string;
   timeRange: string;
@@ -12,13 +13,13 @@ interface VehicleSelectorProps {
   onTimeRangeChange: (timeRange: string) => void;
 }
 
-export const VehicleSelector = ({ 
+export const OptimizedVehicleSelector = React.memo(({ 
   vehicles, 
   selectedVehicle, 
   timeRange, 
   onVehicleChange, 
   onTimeRangeChange 
-}: VehicleSelectorProps) => {
+}: OptimizedVehicleSelectorProps) => {
   return (
     <Card>
       <CardHeader>
@@ -29,7 +30,7 @@ export const VehicleSelector = ({
           </span>
           <div className="flex gap-2">
             <Select value={selectedVehicle} onValueChange={onVehicleChange}>
-              <SelectTrigger className="w-48">
+              <SelectTrigger className="w-48" aria-label="Select vehicle">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -41,7 +42,7 @@ export const VehicleSelector = ({
               </SelectContent>
             </Select>
             <Select value={timeRange} onValueChange={onTimeRangeChange}>
-              <SelectTrigger className="w-24">
+              <SelectTrigger className="w-24" aria-label="Select time range">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -56,4 +57,6 @@ export const VehicleSelector = ({
       </CardHeader>
     </Card>
   );
-};
+});
+
+OptimizedVehicleSelector.displayName = "OptimizedVehicleSelector";

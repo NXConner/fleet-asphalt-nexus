@@ -3,35 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Wrench, Calendar, TrendingUp } from "lucide-react";
-
-interface MaintenanceAlert {
-  id: string;
-  vehicleId: string;
-  type: 'scheduled' | 'overdue' | 'warning' | 'critical';
-  message: string;
-  dueDate: string;
-  mileage?: number;
-}
-
-interface FleetVehicle {
-  id: string;
-  name: string;
-  type: 'truck' | 'van' | 'trailer' | 'equipment';
-  status: 'active' | 'inactive' | 'maintenance' | 'out-of-service';
-  location: {
-    lat: number;
-    lng: number;
-    address: string;
-    lastUpdate: string;
-  };
-  driver?: string;
-  fuelLevel: number;
-  mileage: number;
-  maintenanceScore: number;
-  route?: string;
-  speed: number;
-  engineHours: number;
-}
+import { MaintenanceAlert, FleetVehicle } from "@/types/fleetTypes";
 
 interface FleetMaintenanceTabProps {
   maintenanceAlerts: MaintenanceAlert[];

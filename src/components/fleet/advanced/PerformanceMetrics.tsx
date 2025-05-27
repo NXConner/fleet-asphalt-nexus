@@ -2,23 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Fuel, Route, TrendingUp } from "lucide-react";
-
-interface VehicleMetrics {
-  id: string;
-  name: string;
-  type: string;
-  fuelEfficiency: number;
-  engineTemp: number;
-  oilPressure: number;
-  brakePadLife: number;
-  tireHealth: number;
-  batteryLevel: number;
-  diagnosticCode?: string;
-  lastMaintenance: string;
-  nextService: string;
-  totalMiles: number;
-  todayMiles: number;
-}
+import { VehicleMetrics } from "@/types/fleetTypes";
 
 interface PerformanceMetricsProps {
   vehicle: VehicleMetrics;
