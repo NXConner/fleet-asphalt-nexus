@@ -1,133 +1,221 @@
 
 import { useState } from "react";
-import JobsHeader from "@/components/jobs/JobsHeader";
-import JobsStats from "@/components/jobs/JobsStats";
-import JobsFilters from "@/components/jobs/JobsFilters";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { JobsHeader } from "@/components/jobs/JobsHeader";
+import { JobsStats } from "@/components/jobs/JobsStats";
 import { JobsList } from "@/components/jobs/JobsList";
-import { Job } from "@/types/job";
-
-// Mock data - in a real app, this would come from your backend
-const mockJobs: Job[] = [
-  {
-    id: "JOB-001",
-    title: "Main Street Resurfacing",
-    client: {
-      name: "City Municipality",
-      email: "projects@city.gov",
-      phone: "(555) 123-4567",
-      address: "100 City Hall Plaza"
-    },
-    project: {
-      type: "paving",
-      description: "Complete resurfacing of Main Street from 1st to 10th Ave",
-      location: "Main Street, Downtown",
-      estimatedArea: 2500,
-      estimatedCost: 85000
-    },
-    status: "in-progress",
-    priority: "high",
-    schedule: {
-      startDate: "2024-01-25T08:00:00Z",
-      endDate: "2024-01-30T17:00:00Z",
-      estimatedDuration: 5
-    },
-    assignedVehicles: ["vehicle-1", "vehicle-2"],
-    assignedCrew: ["crew-alpha", "crew-beta"],
-    progress: 65,
-    timeline: [],
-    createdAt: "2024-01-20T00:00:00Z",
-    updatedAt: "2024-01-27T10:30:00Z"
-  },
-  {
-    id: "JOB-002",
-    title: "Shopping Center Parking Lot",
-    client: {
-      name: "Plaza Properties",
-      email: "maintenance@plaza.com",
-      phone: "(555) 987-6543",
-      address: "200 Commerce Blvd"
-    },
-    project: {
-      type: "maintenance",
-      description: "Crack sealing and patching for shopping center parking",
-      location: "Plaza Shopping Center",
-      estimatedArea: 1800,
-      estimatedCost: 35000
-    },
-    status: "scheduled",
-    priority: "medium",
-    schedule: {
-      startDate: "2024-02-01T09:00:00Z",
-      endDate: "2024-02-03T16:00:00Z",
-      estimatedDuration: 3
-    },
-    assignedVehicles: ["vehicle-3"],
-    assignedCrew: ["crew-gamma"],
-    progress: 0,
-    timeline: [],
-    createdAt: "2024-01-22T00:00:00Z",
-    updatedAt: "2024-01-26T14:20:00Z"
-  }
-];
+import { JobsFilters } from "@/components/jobs/JobsFilters";
+import { ExportUtility } from "@/components/export/ExportUtility";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Plus, MapPin, Calendar, BarChart3 } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { CreateJobForm } from "@/components/CreateJobForm";
+import { toast } from "sonner";
 
 const Jobs = () => {
-  const [jobs] = useState<Job[]>(mockJobs);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [priorityFilter, setPriorityFilter] = useState("all");
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [filters, setFilters] = useState({
+    dateRange: { from: '', to: '' },
+    status: [],
+    priority: [],
+    projectType: [],
+    searchTerm: ''
+  });
 
-  const handleCreateJob = () => {
-    console.log("Create new job");
+  const [jobs, setJobs] = useState([
+    {
+      id: "JOB-001",
+      title: "Main Street Resurfacing",
+      clientName: "City Municipality",
+      projectType: "Road Repair",
+      location: "Main Street, Downtown",
+      estimatedCost: 45000,
+      actualCost: 43500,
+      status: "In Progress",
+      priority: "High",
+      startDate: "2024-01-22",
+      endDate: "2024-01-28",
+      progress: 75,
+      assignedCrew: ["John Smith", "Mike Johnson"],
+      assignedVehicles: ["TRUCK-001", "PAVER-002"],
+      description: "Complete resurfacing of Main Street including pothole repairs"
+    },
+    {
+      id: "JOB-002",
+      title: "ABC Construction Parking Lot",
+      clientName: "ABC Construction",
+      projectType: "Parking Lot",
+      location: "123 Business Park",
+      estimatedCost: 25000,
+      actualCost: 0,
+      status: "Scheduled",
+      priority: "Medium",
+      startDate: "2024-02-01",
+      endDate: "2024-02-05",
+      progress: 0,
+      assignedCrew: ["Sarah Wilson", "David Brown"],
+      assignedVehicles: ["TRUCK-002", "ROLLER-001"],
+      description: "New parking lot construction with drainage and striping"
+    },
+    {
+      id: "JOB-003",
+      title: "Oak Avenue Driveway",
+      clientName: "Residential Client",
+      projectType: "Driveway",
+      location: "456 Oak Avenue",
+      estimatedCost: 8500,
+      actualCost: 8200,
+      status: "Completed",
+      priority: "Low",
+      startDate: "2024-01-10",
+      endDate: "2024-01-12",
+      progress: 100,
+      assignedCrew: ["Tom Anderson"],
+      assignedVehicles: ["TRUCK-003"],
+      description: "Residential driveway paving with decorative edging"
+    }
+  ]);
+
+  const handleCreateJob = (jobData: any) => {
+    const newJob = {
+      id: `JOB-${String(jobs.length + 1).padStart(3, '0')}`,
+      ...jobData,
+      progress: 0,
+      actualCost: 0,
+      status: "Scheduled"
+    };
+    setJobs([...jobs, newJob]);
+    toast.success("Job created successfully");
   };
 
-  const handleJobSelect = (job: Job) => {
-    setSelectedJob(job);
-    console.log("Selected job:", job);
+  const handleStatusChange = (id: string, status: string) => {
+    setJobs(jobs.map(job => 
+      job.id === id ? { ...job, status } : job
+    ));
+    toast.success(`Job ${id} status updated to ${status}`);
+  };
+
+  const handleProgressUpdate = (id: string, progress: number) => {
+    setJobs(jobs.map(job => 
+      job.id === id ? { ...job, progress } : job
+    ));
+    toast.success(`Job ${id} progress updated to ${progress}%`);
   };
 
   const filteredJobs = jobs.filter(job => {
-    const matchesSearch = 
-      job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.project.location.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = !filters.searchTerm || 
+      job.title.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+      job.clientName.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+      job.id.toLowerCase().includes(filters.searchTerm.toLowerCase());
     
-    const matchesStatus = statusFilter === "all" || job.status === statusFilter;
-    const matchesPriority = priorityFilter === "all" || job.priority === priorityFilter;
-    
-    return matchesSearch && matchesStatus && matchesPriority;
+    const matchesStatus = filters.status.length === 0 || filters.status.includes(job.status);
+    const matchesPriority = filters.priority.length === 0 || filters.priority.includes(job.priority);
+    const matchesProjectType = filters.projectType.length === 0 || filters.projectType.includes(job.projectType);
+
+    return matchesSearch && matchesStatus && matchesPriority && matchesProjectType;
   });
 
-  const jobStats = {
-    total: jobs.length,
-    pending: jobs.filter(j => j.status === 'pending').length,
-    inProgress: jobs.filter(j => j.status === 'in-progress').length,
-    completed: jobs.filter(j => j.status === 'completed').length
-  };
+  const totalValue = jobs.reduce((sum, job) => sum + job.estimatedCost, 0);
+  const completedJobs = jobs.filter(job => job.status === "Completed").length;
+  const inProgressJobs = jobs.filter(job => job.status === "In Progress").length;
+  const scheduledJobs = jobs.filter(job => job.status === "Scheduled").length;
+
+  const exportFields = [
+    { key: 'id', label: 'Job ID' },
+    { key: 'title', label: 'Title' },
+    { key: 'clientName', label: 'Client' },
+    { key: 'projectType', label: 'Project Type' },
+    { key: 'location', label: 'Location' },
+    { key: 'estimatedCost', label: 'Estimated Cost' },
+    { key: 'actualCost', label: 'Actual Cost' },
+    { key: 'status', label: 'Status' },
+    { key: 'priority', label: 'Priority' },
+    { key: 'startDate', label: 'Start Date' },
+    { key: 'endDate', label: 'End Date' },
+    { key: 'progress', label: 'Progress' }
+  ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <JobsHeader onCreateJob={handleCreateJob} />
-      
-      <div className="mt-8">
-        <JobsStats stats={jobStats} />
-      </div>
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+        <div className="max-w-7xl mx-auto space-y-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <JobsHeader />
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="w-full sm:w-auto">
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Job
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <CreateJobForm onSubmit={handleCreateJob} />
+              </DialogContent>
+            </Dialog>
+          </div>
 
-      <div className="mt-8">
-        <JobsFilters
-          searchTerm={searchTerm}
-          statusFilter={statusFilter}
-          priorityFilter={priorityFilter}
-          onSearchChange={setSearchTerm}
-          onStatusChange={setStatusFilter}
-          onPriorityChange={setPriorityFilter}
-        />
-      </div>
+          <JobsStats
+            totalJobs={jobs.length}
+            completedJobs={completedJobs}
+            inProgressJobs={inProgressJobs}
+            scheduledJobs={scheduledJobs}
+            totalValue={totalValue}
+          />
 
-      <div className="mt-8">
-        <JobsList jobs={filteredJobs} onJobSelect={handleJobSelect} />
+          <Tabs defaultValue="jobs" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3">
+              <TabsTrigger value="jobs">Jobs</TabsTrigger>
+              <TabsTrigger value="scheduling">
+                <Calendar className="h-4 w-4 mr-2" />
+                Schedule
+              </TabsTrigger>
+              <TabsTrigger value="map">
+                <MapPin className="h-4 w-4 mr-2" />
+                Map View
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="jobs" className="space-y-4">
+              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                <JobsFilters
+                  onFiltersChange={setFilters}
+                  availableStatuses={["Scheduled", "In Progress", "Completed", "On Hold", "Cancelled"]}
+                  availablePriorities={["Low", "Medium", "High", "Urgent"]}
+                  availableProjectTypes={["Road Repair", "Parking Lot", "Driveway", "Maintenance", "Striping"]}
+                />
+                
+                <ExportUtility
+                  data={filteredJobs}
+                  filename="jobs"
+                  availableFields={exportFields}
+                  type="jobs"
+                />
+              </div>
+
+              <JobsList
+                jobs={filteredJobs}
+                onStatusChange={handleStatusChange}
+                onProgressUpdate={handleProgressUpdate}
+              />
+            </TabsContent>
+
+            <TabsContent value="scheduling">
+              <div className="bg-white p-6 rounded-lg border">
+                <h3 className="text-lg font-semibold mb-4">Job Scheduling Calendar</h3>
+                <p className="text-gray-600">Calendar view for job scheduling coming soon...</p>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="map">
+              <div className="bg-white p-6 rounded-lg border">
+                <h3 className="text-lg font-semibold mb-4">Job Locations Map</h3>
+                <p className="text-gray-600">Interactive map view coming soon...</p>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 };
 

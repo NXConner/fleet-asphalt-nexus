@@ -70,9 +70,29 @@ const Estimates = () => {
   const handleConvertToJob = (id: string) => {
     const estimate = estimates.find(est => est.id === id);
     if (estimate) {
-      // In a real app, this would create a job record
-      console.log('Converting estimate to job:', estimate);
-      toast.success(`Estimate ${id} converted to job successfully`);
+      // Create job object from estimate
+      const jobData = {
+        title: `${estimate.projectType} - ${estimate.clientName}`,
+        clientName: estimate.clientName,
+        projectType: estimate.projectType,
+        location: estimate.location,
+        estimatedCost: estimate.amount,
+        priority: "Medium",
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 7 days from now
+        assignedCrew: [],
+        assignedVehicles: [],
+        description: estimate.description
+      };
+      
+      console.log('Converting estimate to job:', jobData);
+      
+      // Update estimate status to converted
+      setEstimates(estimates.map(est => 
+        est.id === id ? { ...est, status: "Converted" } : est
+      ));
+      
+      toast.success(`Estimate ${id} converted to job successfully. View in Jobs page.`);
     }
   };
 
@@ -160,7 +180,7 @@ const Estimates = () => {
               <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <AdvancedFilters
                   onFiltersChange={setFilters}
-                  availableStatuses={["Pending", "Approved", "Draft", "Rejected"]}
+                  availableStatuses={["Pending", "Approved", "Draft", "Rejected", "Converted"]}
                   availableProjectTypes={["Parking Lot", "Road Repair", "Driveway", "Paving", "Maintenance"]}
                 />
                 
@@ -183,6 +203,7 @@ const Estimates = () => {
                             estimate.status === 'Approved' ? 'bg-green-100 text-green-800' :
                             estimate.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
                             estimate.status === 'Draft' ? 'bg-gray-100 text-gray-800' :
+                            estimate.status === 'Converted' ? 'bg-blue-100 text-blue-800' :
                             'bg-red-100 text-red-800'
                           }`}>
                             {estimate.status}

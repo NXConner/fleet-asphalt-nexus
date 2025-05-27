@@ -1,70 +1,182 @@
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search } from 'lucide-react';
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { X, Filter } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface JobsFiltersProps {
-  searchTerm: string;
-  statusFilter: string;
-  priorityFilter: string;
-  onSearchChange: (value: string) => void;
-  onStatusChange: (value: string) => void;
-  onPriorityChange: (value: string) => void;
+  onFiltersChange: (filters: any) => void;
+  availableStatuses: string[];
+  availablePriorities: string[];
+  availableProjectTypes: string[];
 }
 
-const JobsFilters = ({
-  searchTerm,
-  statusFilter,
-  priorityFilter,
-  onSearchChange,
-  onStatusChange,
-  onPriorityChange
+export const JobsFilters = ({ 
+  onFiltersChange, 
+  availableStatuses, 
+  availablePriorities,
+  availableProjectTypes 
 }: JobsFiltersProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [filters, setFilters] = useState({
+    searchTerm: '',
+    status: [] as string[],
+    priority: [] as string[],
+    projectType: [] as string[],
+    dateRange: { from: '', to: '' }
+  });
+
+  const updateFilters = (newFilters: any) => {
+    setFilters(newFilters);
+    onFiltersChange(newFilters);
+  };
+
+  const toggleArrayFilter = (array: string[], value: string) => {
+    return array.includes(value) 
+      ? array.filter(item => item !== value)
+      : [...array, value];
+  };
+
+  const clearFilters = () => {
+    const clearedFilters = {
+      searchTerm: '',
+      status: [],
+      priority: [],
+      projectType: [],
+      dateRange: { from: '', to: '' }
+    };
+    updateFilters(clearedFilters);
+  };
+
+  const activeFilterCount = filters.status.length + filters.priority.length + filters.projectType.length + 
+    (filters.searchTerm ? 1 : 0) + (filters.dateRange.from ? 1 : 0);
+
   return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+    <Card className="w-full lg:w-80">
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger asChild>
+          <CardHeader className="cursor-pointer hover:bg-gray-50">
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                <span>Filters</span>
+                {activeFilterCount > 0 && (
+                  <Badge variant="secondary">{activeFilterCount}</Badge>
+                )}
+              </div>
+            </CardTitle>
+          </CardHeader>
+        </CollapsibleTrigger>
+        
+        <CollapsibleContent>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="search">Search</Label>
               <Input
-                placeholder="Search jobs, clients, or locations..."
-                value={searchTerm}
-                onChange={(e) => onSearchChange(e.target.value)}
-                className="pl-10"
+                id="search"
+                placeholder="Search jobs..."
+                value={filters.searchTerm}
+                onChange={(e) => updateFilters({...filters, searchTerm: e.target.value})}
               />
             </div>
-          </div>
-          <Select value={statusFilter} onValueChange={onStatusChange}>
-            <SelectTrigger className="w-full md:w-48">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="scheduled">Scheduled</SelectItem>
-              <SelectItem value="in-progress">In Progress</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={priorityFilter} onValueChange={onPriorityChange}>
-            <SelectTrigger className="w-full md:w-48">
-              <SelectValue placeholder="Filter by priority" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Priorities</SelectItem>
-              <SelectItem value="low">Low</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="high">High</SelectItem>
-              <SelectItem value="urgent">Urgent</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </CardContent>
+
+            <div className="space-y-2">
+              <Label>Date Range</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <Input
+                  type="date"
+                  value={filters.dateRange.from}
+                  onChange={(e) => updateFilters({
+                    ...filters, 
+                    dateRange: {...filters.dateRange, from: e.target.value}
+                  })}
+                />
+                <Input
+                  type="date"
+                  value={filters.dateRange.to}
+                  onChange={(e) => updateFilters({
+                    ...filters, 
+                    dateRange: {...filters.dateRange, to: e.target.value}
+                  })}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <div className="flex flex-wrap gap-1">
+                {availableStatuses.map((status) => (
+                  <Badge
+                    key={status}
+                    variant={filters.status.includes(status) ? "default" : "outline"}
+                    className="cursor-pointer"
+                    onClick={() => updateFilters({
+                      ...filters,
+                      status: toggleArrayFilter(filters.status, status)
+                    })}
+                  >
+                    {status}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Priority</Label>
+              <div className="flex flex-wrap gap-1">
+                {availablePriorities.map((priority) => (
+                  <Badge
+                    key={priority}
+                    variant={filters.priority.includes(priority) ? "default" : "outline"}
+                    className="cursor-pointer"
+                    onClick={() => updateFilters({
+                      ...filters,
+                      priority: toggleArrayFilter(filters.priority, priority)
+                    })}
+                  >
+                    {priority}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Project Type</Label>
+              <div className="flex flex-wrap gap-1">
+                {availableProjectTypes.map((type) => (
+                  <Badge
+                    key={type}
+                    variant={filters.projectType.includes(type) ? "default" : "outline"}
+                    className="cursor-pointer"
+                    onClick={() => updateFilters({
+                      ...filters,
+                      projectType: toggleArrayFilter(filters.projectType, type)
+                    })}
+                  >
+                    {type}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {activeFilterCount > 0 && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={clearFilters}
+                className="w-full"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Clear Filters
+              </Button>
+            )}
+          </CardContent>
+        </CollapsibleContent>
+      </Collapsible>
     </Card>
   );
 };
-
-export default JobsFilters;
