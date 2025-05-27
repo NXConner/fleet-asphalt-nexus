@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
@@ -16,6 +17,8 @@ import Estimates from "./pages/Estimates";
 import RealTimeGPS from "./pages/RealTimeGPS";
 import AdvancedMapping from "./pages/AdvancedMapping";
 import EmployeeManagement from "./pages/EmployeeManagement";
+import EmployeeManagementEnhanced from "./pages/EmployeeManagementEnhanced";
+import InventoryManagementEnhanced from "./pages/InventoryManagementEnhanced";
 import TimeTracking from "./pages/TimeTracking";
 import Scheduling from "./pages/Scheduling";
 import Invoices from "./pages/Invoices";

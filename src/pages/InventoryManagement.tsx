@@ -1,186 +1,237 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
-import { Plus, Search, Package, AlertTriangle, TrendingDown, Truck } from "lucide-react";
-import { InventoryItem, StockMovement, Supplier } from "@/types/inventory";
+import { Plus, Search, Package, AlertTriangle, DollarSign, TrendingDown } from "lucide-react";
+
+// Mock data that matches our types
+const mockInventoryItems = [
+  {
+    id: "item-1",
+    name: "Hot Mix Asphalt",
+    description: "High-quality hot mix asphalt for road construction",
+    category: "asphalt" as const,
+    sku: "HMA-001",
+    currentStock: 2500,
+    minimumStock: 500,
+    maximumStock: 5000,
+    unit: "tons",
+    unitCost: 85.00,
+    totalValue: 212500,
+    supplierId: "sup-1",
+    supplierName: "ABC Asphalt Supply",
+    location: "Warehouse A",
+    lastRestocked: "2024-01-20T00:00:00Z",
+    isActive: true,
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-20T00:00:00Z"
+  },
+  {
+    id: "item-2",
+    name: "Aggregate Base",
+    description: "21A aggregate base material",
+    category: "aggregate" as const,
+    sku: "AGG-21A",
+    currentStock: 1800,
+    minimumStock: 300,
+    maximumStock: 3000,
+    unit: "tons",
+    unitCost: 25.00,
+    totalValue: 45000,
+    supplierId: "sup-2",
+    supplierName: "Rock & Stone Co.",
+    location: "Yard B",
+    lastRestocked: "2024-01-15T00:00:00Z",
+    isActive: true,
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-15T00:00:00Z"
+  }
+];
+
+const mockSuppliers = [
+  {
+    id: "sup-1",
+    name: "ABC Asphalt Supply",
+    contactPerson: "John Smith",
+    email: "john@abcasphalt.com",
+    phone: "(555) 123-4567",
+    address: {
+      street: "123 Industrial Way",
+      city: "Richmond",
+      state: "VA",
+      zipCode: "23230"
+    },
+    paymentTerms: "Net 30",
+    isActive: true,
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z"
+  },
+  {
+    id: "sup-2",
+    name: "Rock & Stone Co.",
+    contactPerson: "Jane Doe",
+    email: "jane@rockstone.com",
+    phone: "(555) 987-6543",
+    address: {
+      street: "456 Quarry Road",
+      city: "Richmond",
+      state: "VA",
+      zipCode: "23231"
+    },
+    paymentTerms: "Net 15",
+    isActive: true,
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z"
+  }
+];
 
 const InventoryManagement = () => {
-  const [items] = useState<InventoryItem[]>([
-    {
-      id: "inv-001",
-      category: "asphalt",
-      name: "Hot Mix Asphalt",
-      description: "Standard hot mix asphalt for road construction",
-      sku: "HMA-001",
-      unit: "tons",
-      currentStock: 150,
-      minimumStock: 50,
-      maximumStock: 500,
-      reorderPoint: 75,
-      unitCost: 85,
-      supplierCost: 75,
-      markup: 13.33,
-      sellPrice: 95,
-      supplierId: "sup-001",
-      location: "Yard A",
-      lastRestocked: "2024-01-20T00:00:00Z",
-      status: "active",
-      createdAt: "2024-01-01T00:00:00Z",
-      updatedAt: "2024-01-20T00:00:00Z"
-    },
-    {
-      id: "inv-002",
-      category: "aggregate",
-      name: "Crushed Stone Base",
-      description: "Grade A crushed stone for base layer",
-      sku: "CSB-001",
-      unit: "tons",
-      currentStock: 25,
-      minimumStock: 30,
-      maximumStock: 200,
-      reorderPoint: 45,
-      unitCost: 35,
-      supplierCost: 30,
-      markup: 16.67,
-      sellPrice: 42,
-      supplierId: "sup-002",
-      location: "Yard B",
-      lastRestocked: "2024-01-15T00:00:00Z",
-      status: "active",
-      createdAt: "2024-01-01T00:00:00Z",
-      updatedAt: "2024-01-15T00:00:00Z"
-    }
-  ]);
-
-  const [movements] = useState<StockMovement[]>([
-    {
-      id: "mov-001",
-      itemId: "inv-001",
-      type: "out",
-      quantity: 25,
-      reason: "Job JOB-001 - Main Street Project",
-      reference: "JOB-001",
-      userId: "user-1",
-      date: "2024-01-25T00:00:00Z",
-      notes: "Used for main street resurfacing"
-    }
-  ]);
-
-  const [suppliers] = useState<Supplier[]>([
-    {
-      id: "sup-001",
-      name: "Florida Asphalt Co.",
-      contact: "Mike Johnson",
-      email: "mike@flasphalt.com",
-      phone: "(555) 234-5678",
-      address: "123 Industrial Blvd, Orlando, FL",
-      paymentTerms: "Net 30",
-      status: "active",
-      rating: 4.5,
-      createdAt: "2024-01-01T00:00:00Z"
-    }
-  ]);
-
+  const [inventoryItems] = useState(mockInventoryItems);
+  const [suppliers] = useState(mockSuppliers);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredItems = items.filter(item =>
+  const filteredItems = inventoryItems.filter(item =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.sku.toLowerCase().includes(searchTerm.toLowerCase())
+    item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getStockStatus = (item: InventoryItem) => {
-    if (item.currentStock <= 0) return { status: 'out-of-stock', color: 'bg-red-100 text-red-800' };
-    if (item.currentStock <= item.reorderPoint) return { status: 'reorder-needed', color: 'bg-orange-100 text-orange-800' };
-    if (item.currentStock <= item.minimumStock) return { status: 'low-stock', color: 'bg-yellow-100 text-yellow-800' };
-    return { status: 'in-stock', color: 'bg-green-100 text-green-800' };
+  const lowStockItems = inventoryItems.filter(item => item.currentStock <= item.minimumStock && item.isActive);
+  const totalValue = inventoryItems.reduce((total, item) => total + item.totalValue, 0);
+
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'asphalt': return 'bg-blue-100 text-blue-800';
+      case 'aggregate': return 'bg-green-100 text-green-800';
+      case 'equipment': return 'bg-orange-100 text-orange-800';
+      case 'tools': return 'bg-purple-100 text-purple-800';
+      case 'chemicals': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
-  const getStockPercentage = (item: InventoryItem) => {
-    return Math.min((item.currentStock / item.maximumStock) * 100, 100);
+  const getStockStatus = (item: any) => {
+    if (item.currentStock <= item.minimumStock) {
+      return { status: 'Low Stock', color: 'bg-red-100 text-red-800' };
+    } else if (item.currentStock >= item.maximumStock) {
+      return { status: 'Overstocked', color: 'bg-yellow-100 text-yellow-800' };
+    }
+    return { status: 'In Stock', color: 'bg-green-100 text-green-800' };
   };
 
   const stats = {
-    totalItems: items.length,
-    lowStockItems: items.filter(i => i.currentStock <= i.minimumStock).length,
-    outOfStockItems: items.filter(i => i.currentStock <= 0).length,
-    totalValue: items.reduce((sum, i) => sum + (i.currentStock * i.unitCost), 0)
+    totalItems: inventoryItems.length,
+    lowStockCount: lowStockItems.length,
+    totalValue: totalValue,
+    activeSuppliers: suppliers.filter(s => s.isActive).length
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Inventory Management</h1>
-        <p className="text-muted-foreground mt-2">
-          Track materials, supplies, and equipment inventory
-        </p>
-      </div>
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Inventory Management</h1>
+            <p className="text-gray-600 mt-2">Track materials, supplies, and equipment</p>
+          </div>
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Inventory Item
+          </Button>
+        </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2">
-              <Package className="h-5 w-5 text-blue-600" />
-              <div>
-                <div className="text-2xl font-bold">{stats.totalItems}</div>
-                <div className="text-sm text-muted-foreground">Total Items</div>
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2">
+                <Package className="h-5 w-5 text-blue-600" />
+                <div>
+                  <div className="text-2xl font-bold">{stats.totalItems}</div>
+                  <div className="text-sm text-muted-foreground">Total Items</div>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-orange-600" />
-              <div>
-                <div className="text-2xl font-bold">{stats.lowStockItems}</div>
-                <div className="text-sm text-muted-foreground">Low Stock Items</div>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-red-600" />
+                <div>
+                  <div className="text-2xl font-bold text-red-600">{stats.lowStockCount}</div>
+                  <div className="text-sm text-muted-foreground">Low Stock Items</div>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2">
-              <TrendingDown className="h-5 w-5 text-red-600" />
-              <div>
-                <div className="text-2xl font-bold">{stats.outOfStockItems}</div>
-                <div className="text-sm text-muted-foreground">Out of Stock</div>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5 text-green-600" />
+                <div>
+                  <div className="text-2xl font-bold">${stats.totalValue.toLocaleString()}</div>
+                  <div className="text-sm text-muted-foreground">Total Inventory Value</div>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2">
-              <Package className="h-5 w-5 text-green-600" />
-              <div>
-                <div className="text-2xl font-bold">${stats.totalValue.toLocaleString()}</div>
-                <div className="text-sm text-muted-foreground">Total Value</div>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2">
+                <TrendingDown className="h-5 w-5 text-purple-600" />
+                <div>
+                  <div className="text-2xl font-bold">{stats.activeSuppliers}</div>
+                  <div className="text-sm text-muted-foreground">Active Suppliers</div>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
 
-      <Tabs defaultValue="inventory" className="space-y-6">
-        <div className="flex justify-between items-center">
-          <TabsList>
-            <TabsTrigger value="inventory">Inventory</TabsTrigger>
-            <TabsTrigger value="movements">Stock Movements</TabsTrigger>
-            <TabsTrigger value="suppliers">Suppliers</TabsTrigger>
-            <TabsTrigger value="alerts">Alerts</TabsTrigger>
-          </TabsList>
-          
-          <div className="flex gap-4">
+        {/* Low Stock Alert */}
+        {lowStockItems.length > 0 && (
+          <Card className="border-red-200 bg-red-50">
+            <CardHeader>
+              <CardTitle className="text-red-800 flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5" />
+                Low Stock Alert
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {lowStockItems.map((item) => (
+                  <div key={item.id} className="flex justify-between items-center">
+                    <span className="font-medium">{item.name} ({item.sku})</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-red-600">
+                        {item.currentStock} {item.unit} remaining (min: {item.minimumStock})
+                      </span>
+                      <Button size="sm">
+                        Quick Restock
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        <Tabs defaultValue="inventory" className="space-y-6">
+          <div className="flex justify-between items-center">
+            <TabsList>
+              <TabsTrigger value="inventory">Inventory</TabsTrigger>
+              <TabsTrigger value="movements">Stock Movements</TabsTrigger>
+              <TabsTrigger value="suppliers">Suppliers</TabsTrigger>
+              <TabsTrigger value="orders">Purchase Orders</TabsTrigger>
+            </TabsList>
+            
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -190,177 +241,147 @@ const InventoryManagement = () => {
                 className="pl-10 w-64"
               />
             </div>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Item
-            </Button>
           </div>
-        </div>
 
-        <TabsContent value="inventory" className="space-y-4">
-          <div className="grid gap-4">
-            {filteredItems.map((item) => {
-              const stockStatus = getStockStatus(item);
-              const stockPercentage = getStockPercentage(item);
-              
-              return (
-                <Card key={item.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start">
-                      <div className="space-y-3 flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-lg">{item.name}</h3>
-                          <Badge className={stockStatus.color} variant="secondary">
-                            {stockStatus.status.replace('-', ' ')}
-                          </Badge>
-                          <Badge variant="outline">{item.category}</Badge>
+          <TabsContent value="inventory" className="space-y-4">
+            <div className="grid gap-4">
+              {filteredItems.map((item) => {
+                const stockStatus = getStockStatus(item);
+                return (
+                  <Card key={item.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-2 flex-1">
+                          <div className="flex items-center gap-3">
+                            <h3 className="text-lg font-semibold">{item.name}</h3>
+                            <Badge className={getCategoryColor(item.category)}>
+                              {item.category}
+                            </Badge>
+                            <Badge className={stockStatus.color}>
+                              {stockStatus.status}
+                            </Badge>
+                          </div>
+                          
+                          <div className="text-sm text-gray-600">
+                            SKU: {item.sku} | {item.description}
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-sm">
+                            <div>
+                              <span className="font-medium">Current Stock:</span> {item.currentStock} {item.unit}
+                            </div>
+                            <div>
+                              <span className="font-medium">Min Stock:</span> {item.minimumStock} {item.unit}
+                            </div>
+                            <div>
+                              <span className="font-medium">Unit Cost:</span> ${item.unitCost.toFixed(2)}
+                            </div>
+                            <div>
+                              <span className="font-medium">Location:</span> {item.location}
+                            </div>
+                          </div>
+
+                          <div className="text-sm text-gray-500">
+                            Last restocked: {new Date(item.lastRestocked).toLocaleDateString()}
+                            {item.supplierName && ` | Supplier: ${item.supplierName}`}
+                          </div>
                         </div>
                         
-                        <div className="text-sm text-muted-foreground">
-                          <div>SKU: {item.sku} | Location: {item.location}</div>
-                          <div>{item.description}</div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span>Stock Level: {item.currentStock} {item.unit}</span>
-                            <span>Max: {item.maximumStock} {item.unit}</span>
+                        <div className="text-right space-y-2 ml-6">
+                          <div className="text-lg font-bold text-green-600">
+                            ${item.totalValue.toLocaleString()}
                           </div>
-                          <Progress value={stockPercentage} className="h-2" />
-                          <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>Reorder at: {item.reorderPoint}</span>
-                            <span>Min: {item.minimumStock}</span>
+                          <div className="text-sm text-gray-500">
+                            Total Value
+                          </div>
+                          <div className="flex gap-2">
+                            <Button size="sm" variant="outline">
+                              Edit
+                            </Button>
+                            <Button size="sm" variant="outline">
+                              Restock
+                            </Button>
                           </div>
                         </div>
                       </div>
-                      
-                      <div className="text-right space-y-2 ml-6">
-                        <div className="text-sm text-muted-foreground">
-                          <div>Cost: ${item.unitCost}/{item.unit}</div>
-                          <div>Sell: ${item.sellPrice}/{item.unit}</div>
-                          <div>Margin: {item.markup.toFixed(1)}%</div>
-                        </div>
-                        <div className="text-lg font-bold text-green-600">
-                          ${(item.currentStock * item.unitCost).toLocaleString()}
-                        </div>
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline">
-                            Adjust Stock
-                          </Button>
-                          <Button size="sm" variant="outline">
-                            Reorder
-                          </Button>
-                          <Button size="sm">
-                            Edit
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </TabsContent>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </TabsContent>
 
-        <TabsContent value="movements" className="space-y-4">
-          <div className="grid gap-4">
-            {movements.map((movement) => {
-              const item = items.find(i => i.id === movement.itemId);
-              return (
-                <Card key={movement.id} className="hover:shadow-md transition-shadow">
+          <TabsContent value="movements" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Stock Movements</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <p className="text-gray-500 mb-4">No stock movements recorded yet</p>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Record Movement
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="suppliers" className="space-y-4">
+            <div className="grid gap-4">
+              {suppliers.map((supplier) => (
+                <Card key={supplier.id} className="hover:shadow-md transition-shadow">
                   <CardContent className="p-6">
-                    <div className="flex justify-between items-center">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold">{item?.name}</h3>
-                          <Badge variant={movement.type === 'in' ? 'default' : 'secondary'}>
-                            {movement.type === 'in' ? 'Stock In' : 'Stock Out'}
-                          </Badge>
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-2">
+                        <h3 className="text-lg font-semibold">{supplier.name}</h3>
+                        <div className="text-sm text-gray-600">
+                          Contact: {supplier.contactPerson}
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          <div>Quantity: {movement.quantity} {item?.unit}</div>
-                          <div>Reason: {movement.reason}</div>
-                          {movement.reference && <div>Reference: {movement.reference}</div>}
+                        <div className="text-sm text-gray-600">
+                          {supplier.email} | {supplier.phone}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {supplier.address.city}, {supplier.address.state}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Payment Terms: {supplier.paymentTerms}
                         </div>
                       </div>
-                      <div className="text-right text-sm text-muted-foreground">
-                        {new Date(movement.date).toLocaleDateString()}
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline">
+                          Edit
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          Create Order
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-              );
-            })}
-          </div>
-        </TabsContent>
+              ))}
+            </div>
+          </TabsContent>
 
-        <TabsContent value="suppliers" className="space-y-4">
-          <div className="grid gap-4">
-            {suppliers.map((supplier) => (
-              <Card key={supplier.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-lg">{supplier.name}</h3>
-                        <Badge className="bg-green-100 text-green-800" variant="secondary">
-                          {supplier.status}
-                        </Badge>
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        <div>Contact: {supplier.contact}</div>
-                        <div>Email: {supplier.email}</div>
-                        <div>Phone: {supplier.phone}</div>
-                        <div>Address: {supplier.address}</div>
-                        <div>Payment Terms: {supplier.paymentTerms}</div>
-                        <div>Rating: {supplier.rating}/5</div>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline">
-                        <Truck className="h-4 w-4 mr-2" />
-                        Create Order
-                      </Button>
-                      <Button size="sm" variant="outline">
-                        Contact
-                      </Button>
-                      <Button size="sm">
-                        Edit
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="alerts" className="space-y-4">
-          <div className="grid gap-4">
-            {items.filter(item => item.currentStock <= item.reorderPoint).map((item) => (
-              <Card key={item.id} className="border-orange-200 bg-orange-50">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="h-5 w-5 text-orange-600" />
-                      <div>
-                        <h3 className="font-semibold">{item.name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Current stock: {item.currentStock} {item.unit} (Reorder point: {item.reorderPoint})
-                        </p>
-                      </div>
-                    </div>
-                    <Button size="sm">
-                      Reorder Now
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="orders" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Purchase Orders</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <p className="text-gray-500 mb-4">No purchase orders created yet</p>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Purchase Order
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };

@@ -1,7 +1,6 @@
 
 export interface Employee {
   id: string;
-  employeeId: string;
   personalInfo: {
     firstName: string;
     lastName: string;
@@ -17,6 +16,7 @@ export interface Employee {
     };
   };
   employment: {
+    employeeId: string;
     hireDate: string;
     terminationDate?: string;
     status: 'active' | 'inactive' | 'terminated' | 'on-leave';
@@ -57,6 +57,7 @@ export interface Employee {
     email?: string;
   };
   documents: EmployeeDocument[];
+  notes?: string;
   createdAt: string;
   updatedAt: string;
 }
