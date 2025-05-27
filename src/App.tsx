@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
@@ -93,6 +92,16 @@ function App() {
                   <Route path="/employee-management" element={
                     <ProtectedRoute>
                       <EmployeeManagement />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/employee-management-enhanced" element={
+                    <ProtectedRoute>
+                      <EmployeeManagementEnhanced />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/inventory-enhanced" element={
+                    <ProtectedRoute>
+                      <InventoryManagementEnhanced />
                     </ProtectedRoute>
                   } />
                   <Route path="/time-tracking" element={

@@ -1,24 +1,23 @@
 
 export interface InventoryItem {
   id: string;
-  category: 'asphalt' | 'aggregate' | 'equipment' | 'tools' | 'supplies' | 'chemicals';
   name: string;
   description: string;
+  category: 'asphalt' | 'aggregate' | 'equipment' | 'tools' | 'chemicals' | 'other';
   sku: string;
-  unit: 'tons' | 'gallons' | 'bags' | 'yards' | 'pieces' | 'hours';
   currentStock: number;
   minimumStock: number;
   maximumStock: number;
-  reorderPoint: number;
+  unit: string;
   unitCost: number;
-  supplierCost: number;
-  markup: number;
-  sellPrice: number;
+  totalValue: number;
   supplierId?: string;
+  supplierName?: string;
   location: string;
   lastRestocked: string;
-  expiryDate?: string;
-  status: 'active' | 'discontinued' | 'out-of-stock';
+  expirationDate?: string;
+  notes?: string;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -26,11 +25,12 @@ export interface InventoryItem {
 export interface StockMovement {
   id: string;
   itemId: string;
-  type: 'in' | 'out' | 'adjustment' | 'transfer';
+  type: 'in' | 'out' | 'adjustment';
   quantity: number;
   reason: string;
   reference?: string;
-  userId: string;
+  jobId?: string;
+  userId?: string;
   date: string;
   notes?: string;
 }
@@ -38,12 +38,46 @@ export interface StockMovement {
 export interface Supplier {
   id: string;
   name: string;
-  contact: string;
-  email: string;
-  phone: string;
-  address: string;
-  paymentTerms: string;
-  status: 'active' | 'inactive';
-  rating: number;
+  contactPerson?: string;
+  email?: string;
+  phone?: string;
+  address?: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  };
+  paymentTerms?: string;
+  notes?: string;
+  isActive: boolean;
   createdAt: string;
+  updatedAt: string;
+}
+
+export interface PurchaseOrder {
+  id: string;
+  orderNumber: string;
+  supplierId: string;
+  supplierName: string;
+  items: PurchaseOrderItem[];
+  subtotal: number;
+  tax: number;
+  total: number;
+  status: 'draft' | 'sent' | 'confirmed' | 'received' | 'cancelled';
+  orderDate: string;
+  expectedDelivery?: string;
+  actualDelivery?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PurchaseOrderItem {
+  id: string;
+  itemId: string;
+  itemName: string;
+  quantity: number;
+  unitCost: number;
+  total: number;
+  received?: number;
 }
