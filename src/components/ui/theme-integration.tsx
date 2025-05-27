@@ -100,7 +100,7 @@ export function ThemeIntegration({
       {effects.background && (
         <InteractiveBackground 
           variant="neural" 
-          density="normal" 
+          density="medium" 
           speed="normal" 
         />
       )}
@@ -108,7 +108,7 @@ export function ThemeIntegration({
       {effects.particles && (
         <ParticleSystem 
           variant="cosmic" 
-          density="sparse" 
+          density="low" 
           speed="slow" 
           connections={false}
         />
