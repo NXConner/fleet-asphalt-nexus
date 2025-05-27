@@ -7,10 +7,11 @@ import { ResourceAllocation } from "@/components/dashboard/ResourceAllocation";
 import { UnifiedReports } from "@/components/dashboard/UnifiedReports";
 import { JobResourceOptimization } from "@/components/dashboard/JobResourceOptimization";
 import { LiveFleetMap } from "@/components/dashboard/LiveFleetMap";
+import { EmployeeTrackingMap } from "@/components/dashboard/EmployeeTrackingMap";
 import { DriverManagement } from "@/components/fleet/DriverManagement";
 import { DashboardThemeIntegration } from "@/components/ui/dashboard-theme-integration";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Calculator, Briefcase, TrendingUp, Truck, Users, DollarSign, Clock } from "lucide-react";
+import { FileText, Calculator, Briefcase, TrendingUp, Truck, Users, DollarSign, Clock, MapPin } from "lucide-react";
 import { Job } from "@/types/job";
 import { Driver } from "@/types/driver";
 
@@ -325,9 +326,10 @@ const Dashboard = () => {
       <StatsGrid stats={stats} />
 
       <Tabs defaultValue="overview" className="mt-8">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="fleet">Fleet Management</TabsTrigger>
+          <TabsTrigger value="tracking">Employee Tracking</TabsTrigger>
           <TabsTrigger value="optimization">Optimization</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
           <TabsTrigger value="themes">Themes</TabsTrigger>
@@ -351,6 +353,10 @@ const Dashboard = () => {
             <ResourceAllocation resources={mockResources} />
             <DriverManagement drivers={mockDrivers} onDriverSelect={handleDriverSelect} />
           </div>
+        </TabsContent>
+
+        <TabsContent value="tracking" className="mt-6">
+          <EmployeeTrackingMap />
         </TabsContent>
 
         <TabsContent value="optimization" className="mt-6">
