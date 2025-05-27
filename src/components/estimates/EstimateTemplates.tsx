@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileTemplate, Plus } from 'lucide-react';
+import { FileText, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface EstimateTemplate {
@@ -77,7 +76,7 @@ export const EstimateTemplates = ({ onUseTemplate }: { onUseTemplate: (template:
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2">
-                  <FileTemplate className="h-5 w-5 text-blue-600" />
+                  <FileText className="h-5 w-5 text-blue-600" />
                   <CardTitle className="text-base">{template.name}</CardTitle>
                 </div>
                 <Badge variant="secondary">{template.projectType}</Badge>

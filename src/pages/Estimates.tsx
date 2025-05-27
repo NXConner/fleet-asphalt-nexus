@@ -12,7 +12,7 @@ import { ExportUtility } from "@/components/export/ExportUtility";
 import { EstimateFormEnhanced } from "@/components/forms/EstimateFormEnhanced";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, BarChart3, FileTemplate, Clock } from "lucide-react";
+import { Plus, BarChart3, FileText, Clock } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
@@ -147,7 +147,7 @@ const Estimates = () => {
                 Analytics
               </TabsTrigger>
               <TabsTrigger value="templates">
-                <FileTemplate className="h-4 w-4 mr-2" />
+                <FileText className="h-4 w-4 mr-2" />
                 Templates
               </TabsTrigger>
               <TabsTrigger value="followup">
