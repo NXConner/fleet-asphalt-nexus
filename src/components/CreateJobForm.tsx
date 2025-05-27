@@ -1,305 +1,179 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Plus } from 'lucide-react';
-import { format } from 'date-fns';
-import { Job } from '@/types/job';
-import { toast } from '@/hooks/use-toast';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CalendarDays, MapPin, Users, Truck } from "lucide-react";
 
 interface CreateJobFormProps {
-  onJobCreated: (job: Job) => void;
-  onCancel: () => void;
+  onSubmit: (jobData: any) => void;
 }
 
-const CreateJobForm: React.FC<CreateJobFormProps> = ({ onJobCreated, onCancel }) => {
+const CreateJobForm = ({ onSubmit }: CreateJobFormProps) => {
   const [formData, setFormData] = useState({
     title: '',
     clientName: '',
-    clientEmail: '',
-    clientPhone: '',
-    clientAddress: '',
-    projectType: '',
-    projectDescription: '',
-    projectLocation: '',
-    estimatedArea: '',
+    projectType: 'Road Repair',
+    location: '',
     estimatedCost: '',
-    priority: 'medium',
-    startDate: undefined as Date | undefined,
-    endDate: undefined as Date | undefined,
-    estimatedDuration: ''
+    priority: 'Medium',
+    startDate: '',
+    endDate: '',
+    assignedCrew: [],
+    assignedVehicles: [],
+    description: ''
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.title || !formData.clientName || !formData.projectType || !formData.startDate) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const newJob: Job = {
-      id: `JOB-${Date.now()}`,
-      title: formData.title,
-      client: {
-        name: formData.clientName,
-        email: formData.clientEmail,
-        phone: formData.clientPhone,
-        address: formData.clientAddress
-      },
-      project: {
-        type: formData.projectType as any,
-        description: formData.projectDescription,
-        location: formData.projectLocation,
-        estimatedArea: parseFloat(formData.estimatedArea) || 0,
-        estimatedCost: parseFloat(formData.estimatedCost) || 0
-      },
-      status: 'pending',
-      priority: formData.priority as any,
-      schedule: {
-        startDate: formData.startDate.toISOString(),
-        endDate: formData.endDate?.toISOString() || formData.startDate.toISOString(),
-        estimatedDuration: parseInt(formData.estimatedDuration) || 1
-      },
-      assignedVehicles: [],
-      assignedCrew: [],
-      progress: 0,
-      timeline: [{
-        id: `timeline-${Date.now()}`,
-        type: 'created',
-        title: 'Job Created',
-        description: `Job "${formData.title}" was created`,
-        timestamp: new Date().toISOString(),
-        user: 'Current User'
-      }],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+    const jobData = {
+      ...formData,
+      estimatedCost: Number(formData.estimatedCost),
+      assignedCrew: formData.assignedCrew.length > 0 ? formData.assignedCrew : [],
+      assignedVehicles: formData.assignedVehicles.length > 0 ? formData.assignedVehicles : []
     };
+    onSubmit(jobData);
+  };
 
-    onJobCreated(newJob);
-    toast({
-      title: "Job Created",
-      description: `Job "${newJob.title}" has been created successfully.`
-    });
+  const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
+    <Card className="w-full max-w-4xl">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Plus className="h-5 w-5" />
+          <CalendarDays className="h-5 w-5" />
           Create New Job
         </CardTitle>
         <CardDescription>
-          Fill in the details to create a new asphalt job
+          Fill in the details to create a new job for your team
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Job Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Job Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Job Title *</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="Main Street Paving Project"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="priority">Priority</Label>
-                <Select value={formData.priority} onValueChange={(value) => setFormData(prev => ({ ...prev, priority: value }))}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="urgent">Urgent</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-
-          {/* Client Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Client Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="clientName">Client Name *</Label>
-                <Input
-                  id="clientName"
-                  value={formData.clientName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, clientName: e.target.value }))}
-                  placeholder="ABC Construction Company"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="clientEmail">Email</Label>
-                <Input
-                  id="clientEmail"
-                  type="email"
-                  value={formData.clientEmail}
-                  onChange={(e) => setFormData(prev => ({ ...prev, clientEmail: e.target.value }))}
-                  placeholder="contact@abcconstruction.com"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="clientPhone">Phone</Label>
-                <Input
-                  id="clientPhone"
-                  value={formData.clientPhone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, clientPhone: e.target.value }))}
-                  placeholder="(555) 123-4567"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="clientAddress">Address</Label>
-                <Input
-                  id="clientAddress"
-                  value={formData.clientAddress}
-                  onChange={(e) => setFormData(prev => ({ ...prev, clientAddress: e.target.value }))}
-                  placeholder="123 Main St, City, State"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Project Details */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Project Details</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="projectType">Project Type *</Label>
-                <Select value={formData.projectType} onValueChange={(value) => setFormData(prev => ({ ...prev, projectType: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select project type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="paving">Paving</SelectItem>
-                    <SelectItem value="maintenance">Maintenance</SelectItem>
-                    <SelectItem value="striping">Striping</SelectItem>
-                    <SelectItem value="sealcoating">Sealcoating</SelectItem>
-                    <SelectItem value="patching">Patching</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="projectLocation">Project Location</Label>
-                <Input
-                  id="projectLocation"
-                  value={formData.projectLocation}
-                  onChange={(e) => setFormData(prev => ({ ...prev, projectLocation: e.target.value }))}
-                  placeholder="Main Street, Downtown"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="estimatedArea">Estimated Area (sq ft)</Label>
-                <Input
-                  id="estimatedArea"
-                  type="number"
-                  value={formData.estimatedArea}
-                  onChange={(e) => setFormData(prev => ({ ...prev, estimatedArea: e.target.value }))}
-                  placeholder="5000"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="estimatedCost">Estimated Cost ($)</Label>
-                <Input
-                  id="estimatedCost"
-                  type="number"
-                  value={formData.estimatedCost}
-                  onChange={(e) => setFormData(prev => ({ ...prev, estimatedCost: e.target.value }))}
-                  placeholder="25000"
-                />
-              </div>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="projectDescription">Project Description</Label>
-              <Textarea
-                id="projectDescription"
-                value={formData.projectDescription}
-                onChange={(e) => setFormData(prev => ({ ...prev, projectDescription: e.target.value }))}
-                placeholder="Detailed description of the project requirements..."
-                rows={3}
+              <Label htmlFor="title">Job Title *</Label>
+              <Input
+                id="title"
+                placeholder="Enter job title"
+                value={formData.title}
+                onChange={(e) => handleInputChange('title', e.target.value)}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="clientName">Client Name *</Label>
+              <Input
+                id="clientName"
+                placeholder="Enter client name"
+                value={formData.clientName}
+                onChange={(e) => handleInputChange('clientName', e.target.value)}
+                required
               />
             </div>
           </div>
 
-          {/* Schedule */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Schedule</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label>Start Date *</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formData.startDate ? format(formData.startDate, "PPP") : "Pick start date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={formData.startDate}
-                      onSelect={(date) => setFormData(prev => ({ ...prev, startDate: date }))}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="space-y-2">
-                <Label>End Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formData.endDate ? format(formData.endDate, "PPP") : "Pick end date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={formData.endDate}
-                      onSelect={(date) => setFormData(prev => ({ ...prev, endDate: date }))}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="estimatedDuration">Duration (days)</Label>
-                <Input
-                  id="estimatedDuration"
-                  type="number"
-                  value={formData.estimatedDuration}
-                  onChange={(e) => setFormData(prev => ({ ...prev, estimatedDuration: e.target.value }))}
-                  placeholder="5"
-                />
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="projectType">Project Type</Label>
+              <select
+                id="projectType"
+                value={formData.projectType}
+                onChange={(e) => handleInputChange('projectType', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="Road Repair">Road Repair</option>
+                <option value="Parking Lot">Parking Lot</option>
+                <option value="Driveway">Driveway</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Striping">Striping</option>
+              </select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="priority">Priority</Label>
+              <select
+                id="priority"
+                value={formData.priority}
+                onChange={(e) => handleInputChange('priority', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Urgent">Urgent</option>
+              </select>
             </div>
           </div>
 
-          <div className="flex justify-end space-x-4 pt-6">
-            <Button type="button" variant="outline" onClick={onCancel}>
+          <div className="space-y-2">
+            <Label htmlFor="location" className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              Location *
+            </Label>
+            <Input
+              id="location"
+              placeholder="Enter job location"
+              value={formData.location}
+              onChange={(e) => handleInputChange('location', e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="estimatedCost">Estimated Cost</Label>
+            <Input
+              id="estimatedCost"
+              type="number"
+              placeholder="Enter estimated cost"
+              value={formData.estimatedCost}
+              onChange={(e) => handleInputChange('estimatedCost', e.target.value)}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="startDate">Start Date</Label>
+              <Input
+                id="startDate"
+                type="date"
+                value={formData.startDate}
+                onChange={(e) => handleInputChange('startDate', e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="endDate">End Date</Label>
+              <Input
+                id="endDate"
+                type="date"
+                value={formData.endDate}
+                onChange={(e) => handleInputChange('endDate', e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              placeholder="Enter job description"
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              rows={3}
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-6">
+            <Button type="button" variant="outline">
               Cancel
             </Button>
             <Button type="submit">
