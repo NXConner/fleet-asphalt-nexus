@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
@@ -287,30 +288,30 @@ const FloatingElement = React.forwardRef<HTMLDivElement, FloatingElementProps>(
 
       let animationId: number;
       let startTime: number;
+      const distanceValue = distanceValues[distance];
 
       const animate = (timestamp: number) => {
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
         const progress = (elapsed % speedValues[speed]) / speedValues[speed];
 
-        const distance = distanceValues[distance];
         let x = 0;
         let y = 0;
 
         switch (variant) {
           case "bubble":
-            y = Math.sin(progress * Math.PI * 2) * distance;
+            y = Math.sin(progress * Math.PI * 2) * distanceValue;
             break;
           case "orbit":
-            x = Math.cos(progress * Math.PI * 2) * distance;
-            y = Math.sin(progress * Math.PI * 2) * distance;
+            x = Math.cos(progress * Math.PI * 2) * distanceValue;
+            y = Math.sin(progress * Math.PI * 2) * distanceValue;
             break;
           case "drift":
-            x = Math.sin(progress * Math.PI * 2) * distance * 0.5;
-            y = Math.cos(progress * Math.PI * 2 * 0.7) * distance;
+            x = Math.sin(progress * Math.PI * 2) * distanceValue * 0.5;
+            y = Math.cos(progress * Math.PI * 2 * 0.7) * distanceValue;
             break;
           case "bounce":
-            y = Math.abs(Math.sin(progress * Math.PI * 4)) * distance;
+            y = Math.abs(Math.sin(progress * Math.PI * 4)) * distanceValue;
             break;
         }
 
