@@ -1,12 +1,24 @@
+
 import { useState } from "react";
-import SearchFilter from "@/components/SearchFilter";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import EstimatesHeader from "@/components/estimates/EstimatesHeader";
 import EstimatesStats from "@/components/estimates/EstimatesStats";
 import EstimatesList from "@/components/estimates/EstimatesList";
+import { AdvancedFilters } from "@/components/filters/AdvancedFilters";
+import { ExportUtility } from "@/components/export/ExportUtility";
+import { EstimateFormEnhanced } from "@/components/forms/EstimateFormEnhanced";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 const Estimates = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [filters, setFilters] = useState({
+    dateRange: { from: '', to: '' },
+    status: [],
+    amountRange: { min: 0, max: 0 },
+    projectType: [],
+    searchTerm: ''
+  });
 
   const estimates = [
     {
@@ -44,46 +56,82 @@ const Estimates = () => {
     }
   ];
 
-  const filterOptions = [
-    { value: "Pending", label: "Pending" },
-    { value: "Approved", label: "Approved" },
-    { value: "Draft", label: "Draft" },
-    { value: "Rejected", label: "Rejected" }
-  ];
-
   const filteredEstimates = estimates.filter(estimate => {
-    const matchesSearch = estimate.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         estimate.projectType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         estimate.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = statusFilter === "all" || estimate.status === statusFilter;
-    return matchesSearch && matchesFilter;
+    const matchesSearch = !filters.searchTerm || 
+      estimate.clientName.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+      estimate.projectType.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+      estimate.id.toLowerCase().includes(filters.searchTerm.toLowerCase());
+    
+    const matchesStatus = filters.status.length === 0 || filters.status.includes(estimate.status);
+    const matchesProjectType = filters.projectType.length === 0 || filters.projectType.includes(estimate.projectType);
+    
+    const matchesAmount = (!filters.amountRange.min || estimate.amount >= filters.amountRange.min) &&
+                         (!filters.amountRange.max || estimate.amount <= filters.amountRange.max);
+
+    return matchesSearch && matchesStatus && matchesProjectType && matchesAmount;
   });
 
   const totalValue = estimates.reduce((sum, est) => sum + est.amount, 0);
   const pendingCount = estimates.filter(est => est.status === "Pending").length;
   const approvedCount = estimates.filter(est => est.status === "Approved").length;
 
+  const exportFields = [
+    { key: 'id', label: 'Estimate ID' },
+    { key: 'clientName', label: 'Client Name' },
+    { key: 'projectType', label: 'Project Type' },
+    { key: 'location', label: 'Location' },
+    { key: 'amount', label: 'Amount' },
+    { key: 'status', label: 'Status' },
+    { key: 'date', label: 'Date' },
+    { key: 'expiryDate', label: 'Expiry Date' },
+    { key: 'description', label: 'Description' }
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <EstimatesHeader />
-        <EstimatesStats
-          totalEstimates={estimates.length}
-          pendingCount={pendingCount}
-          approvedCount={approvedCount}
-          totalValue={totalValue}
-        />
-        <SearchFilter
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          filterValue={statusFilter}
-          onFilterChange={setStatusFilter}
-          filterOptions={filterOptions}
-          placeholder="Search estimates by client, project type, or ID..."
-        />
-        <EstimatesList estimates={filteredEstimates} />
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto space-y-6">
+          <div className="flex justify-between items-center">
+            <EstimatesHeader />
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Estimate
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <EstimateFormEnhanced />
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <EstimatesStats
+            totalEstimates={estimates.length}
+            pendingCount={pendingCount}
+            approvedCount={approvedCount}
+            totalValue={totalValue}
+          />
+
+          <div className="flex justify-between items-center">
+            <AdvancedFilters
+              onFiltersChange={setFilters}
+              availableStatuses={["Pending", "Approved", "Draft", "Rejected"]}
+              availableProjectTypes={["Parking Lot", "Road Repair", "Driveway", "Paving", "Maintenance"]}
+            />
+            
+            <ExportUtility
+              data={filteredEstimates}
+              filename="estimates"
+              availableFields={exportFields}
+              type="estimates"
+            />
+          </div>
+
+          <EstimatesList estimates={filteredEstimates} />
+        </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 };
 
