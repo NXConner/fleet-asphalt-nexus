@@ -1,18 +1,20 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Search, Users, Calendar, DollarSign, Award } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Plus, Search, Users, Calendar, DollarSign, Award, FileText } from "lucide-react";
 import { mockEmployees, mockDepartments } from "@/data/mockEmployeeData";
 import { Employee } from "@/types/employee";
+import { DocumentUpload } from "@/components/employee/DocumentUpload";
 
 const EmployeeManagement = () => {
   const [employees] = useState<Employee[]>(mockEmployees);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [showDocuments, setShowDocuments] = useState(false);
 
   const filteredEmployees = employees.filter(employee =>
     `${employee.personalInfo.firstName} ${employee.personalInfo.lastName}`
@@ -34,6 +36,11 @@ const EmployeeManagement = () => {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const handleDocumentUpload = (document: any) => {
+    console.log('Document uploaded:', document);
+    // Handle document upload logic here
   };
 
   const stats = {
@@ -110,6 +117,7 @@ const EmployeeManagement = () => {
         <div className="flex justify-between items-center">
           <TabsList>
             <TabsTrigger value="employees">Employees</TabsTrigger>
+            <TabsTrigger value="documents">Documents</TabsTrigger>
             <TabsTrigger value="departments">Departments</TabsTrigger>
             <TabsTrigger value="payroll">Payroll</TabsTrigger>
             <TabsTrigger value="benefits">Benefits</TabsTrigger>
@@ -184,6 +192,26 @@ const EmployeeManagement = () => {
                         <Button size="sm" variant="outline">
                           View Profile
                         </Button>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button size="sm" variant="outline">
+                              <FileText className="h-3 w-3 mr-1" />
+                              Documents
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                            <DialogHeader>
+                              <DialogTitle>
+                                Employee Documents - {employee.personalInfo.firstName} {employee.personalInfo.lastName}
+                              </DialogTitle>
+                            </DialogHeader>
+                            <DocumentUpload
+                              employeeId={employee.id}
+                              documents={employee.documents || []}
+                              onDocumentUpload={handleDocumentUpload}
+                            />
+                          </DialogContent>
+                        </Dialog>
                         <Button size="sm">
                           Edit
                         </Button>
@@ -194,6 +222,51 @@ const EmployeeManagement = () => {
               </Card>
             ))}
           </div>
+        </TabsContent>
+
+        <TabsContent value="documents" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Document Management</CardTitle>
+              <CardDescription>Manage employee documents, licenses, and contracts</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="p-4">
+                  <div className="text-center">
+                    <FileText className="h-8 w-8 mx-auto mb-2 text-blue-600" />
+                    <h3 className="font-medium">Driver's Licenses</h3>
+                    <p className="text-sm text-muted-foreground">24 uploaded</p>
+                    <Button size="sm" className="mt-2" variant="outline">
+                      View All
+                    </Button>
+                  </div>
+                </Card>
+                
+                <Card className="p-4">
+                  <div className="text-center">
+                    <FileText className="h-8 w-8 mx-auto mb-2 text-green-600" />
+                    <h3 className="font-medium">W-2 Forms</h3>
+                    <p className="text-sm text-muted-foreground">18 processed</p>
+                    <Button size="sm" className="mt-2" variant="outline">
+                      Generate Reports
+                    </Button>
+                  </div>
+                </Card>
+                
+                <Card className="p-4">
+                  <div className="text-center">
+                    <FileText className="h-8 w-8 mx-auto mb-2 text-orange-600" />
+                    <h3 className="font-medium">Contracts</h3>
+                    <p className="text-sm text-muted-foreground">22 signed</p>
+                    <Button size="sm" className="mt-2" variant="outline">
+                      Review Status
+                    </Button>
+                  </div>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="departments" className="space-y-4">

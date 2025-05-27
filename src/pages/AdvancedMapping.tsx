@@ -16,21 +16,22 @@ import {
   Download,
   Zap,
   Droplets,
-  Activity
+  Activity,
+  Users
 } from "lucide-react";
+import { AsphaltDetection } from "@/components/mapping/AsphaltDetection";
 
 const AdvancedMapping = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [mapMode, setMapMode] = useState<"measure" | "pressure-wash" | "detect">("measure");
-  const [isDetecting, setIsDetecting] = useState(false);
+  const [mapMode, setMapMode] = useState<"measure" | "pressure-wash" | "detect">("detect");
+  const [showEmployeeTracking, setShowEmployeeTracking] = useState(true);
   const [measurements, setMeasurements] = useState({
     area: 0,
     perimeter: 0,
     dirtyZones: 0,
     cleanZones: 0
   });
-  const [detectedAsphalt, setDetectedAsphalt] = useState([]);
-  const [pciData, setPciData] = useState([]);
+  const [selectedArea, setSelectedArea] = useState<any>(null);
 
   const handleGeocodeSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -41,32 +42,6 @@ const AdvancedMapping = () => {
     setSearchQuery("");
   };
 
-  const handleAsphaltDetection = async () => {
-    setIsDetecting(true);
-    
-    // Mock auto-detection API call
-    try {
-      console.log("Calling /api/detect-asphalt endpoint...");
-      
-      // Simulate detection response
-      setTimeout(() => {
-        const mockDetectedAreas = [
-          { id: 1, area: 2500, confidence: 0.94, type: "parking-lot" },
-          { id: 2, area: 800, confidence: 0.87, type: "driveway" }
-        ];
-        setDetectedAsphalt(mockDetectedAreas);
-        setMeasurements(prev => ({ 
-          ...prev, 
-          area: mockDetectedAreas.reduce((sum, area) => sum + area.area, 0) 
-        }));
-        setIsDetecting(false);
-      }, 2000);
-    } catch (error) {
-      console.error("Detection failed:", error);
-      setIsDetecting(false);
-    }
-  };
-
   const handleModeSwitch = (mode: typeof mapMode) => {
     setMapMode(mode);
     if (mode === "pressure-wash") {
@@ -75,22 +50,42 @@ const AdvancedMapping = () => {
     }
   };
 
+  const handleAreaSelect = (area: any) => {
+    setSelectedArea(area);
+    setMeasurements(prev => ({
+      ...prev,
+      area: area.area,
+      perimeter: (area.length + area.width) * 2
+    }));
+  };
+
+  const exportToEstimate = () => {
+    if (selectedArea) {
+      // Navigate to estimates with pre-filled data
+      console.log('Exporting to estimate:', selectedArea);
+      // This would integrate with the estimates system
+      window.location.href = `/estimates-management?area=${selectedArea.area}&length=${selectedArea.length}&width=${selectedArea.width}`;
+    }
+  };
+
   const exportToGeoJSON = () => {
     const geoData = {
       type: "FeatureCollection",
-      features: detectedAsphalt.map(area => ({
+      features: selectedArea ? [{
         type: "Feature",
         geometry: {
           type: "Polygon",
-          coordinates: [[[-74.0059, 40.7128], [-74.0059, 40.7138], [-74.0049, 40.7138], [-74.0049, 40.7128], [-74.0059, 40.7128]]]
+          coordinates: [selectedArea.coordinates.map((coord: any) => [coord.x, coord.y])]
         },
         properties: {
-          id: area.id,
-          area: area.area,
-          confidence: area.confidence,
-          type: area.type
+          id: selectedArea.id,
+          area: selectedArea.area,
+          length: selectedArea.length,
+          width: selectedArea.width,
+          confidence: selectedArea.confidence,
+          manuallyEdited: selectedArea.manuallyEdited
         }
-      }))
+      }] : []
     };
     
     const blob = new Blob([JSON.stringify(geoData, null, 2)], { type: 'application/json' });
@@ -107,7 +102,7 @@ const AdvancedMapping = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Advanced Mapping & Measurement</h1>
         <p className="text-muted-foreground mt-2">
-          Satellite-driven measurement tools with auto-detection and compliance overlays
+          AI-powered asphalt detection with manual editing and real-time employee tracking
         </p>
       </div>
 
@@ -136,7 +131,7 @@ const AdvancedMapping = () => {
           </div>
           
           {/* Mode Switcher */}
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-4 items-center flex-wrap">
             <span className="text-sm font-medium">Mode:</span>
             <div className="flex gap-2">
               <Button 
@@ -164,6 +159,15 @@ const AdvancedMapping = () => {
                 Auto-Detect
               </Button>
             </div>
+            
+            <div className="flex items-center gap-2 ml-auto">
+              <Users className="h-4 w-4" />
+              <span className="text-sm">Employee Tracking</span>
+              <Switch 
+                checked={showEmployeeTracking} 
+                onCheckedChange={setShowEmployeeTracking}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -171,62 +175,50 @@ const AdvancedMapping = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Map Area */}
         <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <Layers className="h-5 w-5" />
-                  Interactive Map
-                </span>
-                <div className="flex gap-2">
-                  {mapMode === "detect" && (
-                    <Button 
-                      onClick={handleAsphaltDetection}
-                      disabled={isDetecting}
-                      size="sm"
-                    >
-                      {isDetecting ? "Detecting..." : "Run Detection"}
+          {mapMode === "detect" ? (
+            <AsphaltDetection 
+              onAreaSelect={handleAreaSelect}
+              showEmployeeTracking={showEmployeeTracking}
+            />
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <Layers className="h-5 w-5" />
+                    Interactive Map
+                  </span>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" onClick={exportToGeoJSON}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Export GeoJSON
                     </Button>
-                  )}
-                  <Button size="sm" variant="outline" onClick={exportToGeoJSON}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Export GeoJSON
-                  </Button>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-slate-100 h-96 rounded-lg flex items-center justify-center relative">
-                {/* Mock Map Interface */}
-                <div className="text-center">
-                  <MapPin className="h-12 w-12 mx-auto mb-4 text-slate-400" />
-                  <p className="text-slate-600">Interactive Satellite Map</p>
-                  <p className="text-sm text-slate-500 mt-2">
-                    {mapMode === "measure" && "Draw shapes to measure area & perimeter"}
-                    {mapMode === "pressure-wash" && "Mark dirty (red) and clean (green) zones"}
-                    {mapMode === "detect" && "AI-powered asphalt detection overlay"}
-                  </p>
-                </div>
-                
-                {/* Mode-specific overlays */}
-                {mapMode === "pressure-wash" && (
-                  <div className="absolute top-4 left-4 flex gap-2">
-                    <Badge className="bg-red-100 text-red-800">Dirty Zones</Badge>
-                    <Badge className="bg-green-100 text-green-800">Clean Zones</Badge>
                   </div>
-                )}
-                
-                {isDetecting && (
-                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
-                    <div className="text-white text-center">
-                      <Activity className="h-8 w-8 mx-auto mb-2 animate-spin" />
-                      <p>Running AI Detection...</p>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-slate-100 h-96 rounded-lg flex items-center justify-center relative">
+                  {/* Mock Map Interface */}
+                  <div className="text-center">
+                    <MapPin className="h-12 w-12 mx-auto mb-4 text-slate-400" />
+                    <p className="text-slate-600">Interactive Satellite Map</p>
+                    <p className="text-sm text-slate-500 mt-2">
+                      {mapMode === "measure" && "Draw shapes to measure area & perimeter"}
+                      {mapMode === "pressure-wash" && "Mark dirty (red) and clean (green) zones"}
+                    </p>
+                  </div>
+                  
+                  {/* Mode-specific overlays */}
+                  {mapMode === "pressure-wash" && (
+                    <div className="absolute top-4 left-4 flex gap-2">
+                      <Badge className="bg-red-100 text-red-800">Dirty Zones</Badge>
+                      <Badge className="bg-green-100 text-green-800">Clean Zones</Badge>
                     </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Measurement Panel */}
@@ -262,30 +254,51 @@ const AdvancedMapping = () => {
                   </div>
                 </div>
               )}
+              
+              {selectedArea && (
+                <div className="pt-2 border-t">
+                  <Button onClick={exportToEstimate} className="w-full">
+                    Export to Estimate
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
-          {/* Detected Asphalt */}
-          {detectedAsphalt.length > 0 && (
+          {/* Employee Tracking Panel */}
+          {showEmployeeTracking && (
             <Card>
               <CardHeader>
-                <CardTitle>Detected Asphalt</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Live Employee Tracking
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {detectedAsphalt.map((area) => (
-                    <div key={area.id} className="flex justify-between items-center p-2 bg-slate-50 rounded">
-                      <div>
-                        <div className="font-medium">{area.type}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {area.area.toLocaleString()} sq ft
-                        </div>
-                      </div>
-                      <Badge variant="outline">
-                        {Math.round(area.confidence * 100)}% confidence
-                      </Badge>
+                  <div className="flex items-center justify-between p-2 bg-green-50 rounded">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span className="text-sm font-medium">John Doe</span>
                     </div>
-                  ))}
+                    <Badge variant="outline" className="text-green-600">Active</Badge>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-2 bg-orange-50 rounded">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                      <span className="text-sm font-medium">Jane Smith</span>
+                    </div>
+                    <Badge variant="outline" className="text-orange-600">Break</Badge>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-2 bg-blue-50 rounded">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                      <span className="text-sm font-medium">Mike Johnson</span>
+                    </div>
+                    <Badge variant="outline" className="text-blue-600">Travel</Badge>
+                  </div>
                 </div>
               </CardContent>
             </Card>

@@ -24,6 +24,7 @@ import Scheduling from "./pages/Scheduling";
 import DocumentManagement from "./pages/DocumentManagement";
 import TimeTracking from "./pages/TimeTracking";
 import RealTimeGPS from "./pages/RealTimeGPS";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { MobileOptimizedLayout } from "./components/mobile/MobileOptimizedLayout";
 import EmployeeManagement from "./pages/EmployeeManagement";
@@ -67,7 +68,7 @@ const App = () => (
                     <Route path="/gps" element={<RealTimeGPS />} />
                     <Route path="/employee-management" element={<EmployeeManagement />} />
                     <Route path="/accounting" element={<AccountingPlatform />} />
-                    <Route path="/settings" element={<div className="p-6"><h1 className="text-2xl font-bold">Settings - Coming Soon</h1></div>} />
+                    <Route path="/settings" element={<Settings />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </div>
