@@ -62,8 +62,8 @@ export function DashboardThemeIntegration({
     <div className={cn("relative overflow-hidden", className)}>
       {showBackground && (
         <>
-          <InteractiveBackground variant="neural" density="sparse" speed="slow" />
-          <ParticleSystem variant="cosmic" density="sparse" speed="slow" connections />
+          <InteractiveBackground variant="neural" density="low" speed="slow" />
+          <ParticleSystem variant="cosmic" density="low" speed="slow" connections />
         </>
       )}
       
