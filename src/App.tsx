@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Navigation from "./components/Navigation";
+import { EnhancedNavigation } from "./components/ui/enhanced-navigation";
 import Dashboard from "./pages/Dashboard";
 import FleetManagement from "./pages/FleetManagement";
 import Estimates from "./pages/Estimates";
@@ -27,7 +27,11 @@ const App = () => (
           <BrowserRouter>
             <ProtectedRoute>
               <div className="min-h-screen bg-background text-foreground">
-                <Navigation />
+                <EnhancedNavigation 
+                  variant="premium"
+                  showThemeControls={true}
+                  enableAnimations={true}
+                />
                 <Routes>
                   <Route path="/" element={<Navigate to="/dashboard" replace />} />
                   <Route path="/dashboard" element={<Dashboard />} />

@@ -6,6 +6,7 @@ import StatsGrid from "@/components/dashboard/StatsGrid";
 import QuickActions from "@/components/dashboard/QuickActions";
 import UpcomingJobs from "@/components/dashboard/UpcomingJobs";
 import RecentActivity from "@/components/dashboard/RecentActivity";
+import { DashboardThemeIntegration } from "@/components/ui/dashboard-theme-integration";
 
 const Dashboard = () => {
   const stats = [
@@ -112,10 +113,18 @@ const Dashboard = () => {
         <StatsGrid stats={stats} />
         <DashboardChart />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <QuickActions />
           <UpcomingJobs jobs={upcomingJobs} />
           <RecentActivity activities={recentActivity} />
+        </div>
+
+        {/* Theme Integration Showcase */}
+        <div className="mt-12">
+          <DashboardThemeIntegration 
+            showBackground={false}
+            enableAnimations={true}
+          />
         </div>
       </div>
     </div>

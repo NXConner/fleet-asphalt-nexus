@@ -62,8 +62,8 @@ export function DashboardThemeIntegration({
     <div className={cn("relative overflow-hidden", className)}>
       {showBackground && (
         <>
-          <InteractiveBackground variant="neural" density="low" speed="slow" />
-          <ParticleSystem variant="cosmic" density="low" speed="slow" connections />
+          <InteractiveBackground variant="neural" density="sparse" speed="slow" />
+          <ParticleSystem variant="cosmic" density="sparse" speed="slow" connections />
         </>
       )}
       
@@ -83,7 +83,7 @@ export function DashboardThemeIntegration({
           </p>
         </ScrollAnimation>
 
-        <ScrollAnimation animation="slide-up" delay={200}>
+        <ScrollAnimation animation="slide-up" className="mt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {themeFeatures.map((feature, index) => (
               <AdvancedCard
@@ -106,7 +106,7 @@ export function DashboardThemeIntegration({
           </div>
         </ScrollAnimation>
 
-        <ScrollAnimation animation="zoom-in" delay={400}>
+        <ScrollAnimation animation="zoom-in" className="mt-8">
           <AdvancedCard variant="holographic" hover glow pattern="circuit">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -152,7 +152,7 @@ export function DashboardThemeIntegration({
           </AdvancedCard>
         </ScrollAnimation>
 
-        <ScrollAnimation animation="slide-up" delay={600}>
+        <ScrollAnimation animation="slide-up" className="mt-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <AdvancedCard variant="gradient" hover animation="shimmer">
               <CardHeader>
