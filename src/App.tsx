@@ -13,6 +13,11 @@ import Estimates from "./pages/Estimates";
 import EstimatesManagement from "./pages/EstimatesManagement";
 import Jobs from "./pages/Jobs";
 import Invoices from "./pages/Invoices";
+import FinancialManagement from "./pages/FinancialManagement";
+import CRM from "./pages/CRM";
+import InventoryManagement from "./pages/InventoryManagement";
+import SafetyCompliance from "./pages/SafetyCompliance";
+import MaintenanceTracking from "./pages/MaintenanceTracking";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +45,11 @@ const App = () => (
                   <Route path="/estimates-management" element={<EstimatesManagement />} />
                   <Route path="/jobs" element={<Jobs />} />
                   <Route path="/invoices" element={<Invoices />} />
+                  <Route path="/financial" element={<FinancialManagement />} />
+                  <Route path="/crm" element={<CRM />} />
+                  <Route path="/inventory" element={<InventoryManagement />} />
+                  <Route path="/safety" element={<SafetyCompliance />} />
+                  <Route path="/maintenance" element={<MaintenanceTracking />} />
                   <Route path="/settings" element={<div className="p-6"><h1 className="text-2xl font-bold">Settings - Coming Soon</h1></div>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
