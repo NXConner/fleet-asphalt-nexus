@@ -1,6 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { useTheme } from "./ThemeProvider";
 
 const revenueData = [
   { month: "Jan", revenue: 95000, jobs: 12 },
@@ -18,6 +19,15 @@ const fleetUtilization = [
 ];
 
 const DashboardChart = () => {
+  const { theme } = useTheme();
+  const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  
+  const chartColors = {
+    grid: isDark ? "#374151" : "#E5E7EB",
+    text: isDark ? "#D1D5DB" : "#374151",
+    bar: isDark ? "#60A5FA" : "#3B82F6"
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <Card>
@@ -28,16 +38,22 @@ const DashboardChart = () => {
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={revenueData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} />
+              <XAxis dataKey="month" tick={{ fill: chartColors.text }} />
+              <YAxis tick={{ fill: chartColors.text }} />
               <Tooltip 
                 formatter={(value, name) => [
                   name === 'revenue' ? `$${value.toLocaleString()}` : value,
                   name === 'revenue' ? 'Revenue' : 'Jobs'
                 ]}
+                contentStyle={{
+                  backgroundColor: isDark ? "#1F2937" : "#FFFFFF",
+                  border: `1px solid ${isDark ? "#374151" : "#E5E7EB"}`,
+                  borderRadius: "6px",
+                  color: chartColors.text
+                }}
               />
-              <Bar dataKey="revenue" fill="#3B82F6" />
+              <Bar dataKey="revenue" fill={chartColors.bar} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -58,12 +74,20 @@ const DashboardChart = () => {
                 outerRadius={80}
                 dataKey="value"
                 label={({ name, value }) => `${name}: ${value}`}
+                labelStyle={{ fill: chartColors.text }}
               >
                 {fleetUtilization.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: isDark ? "#1F2937" : "#FFFFFF",
+                  border: `1px solid ${isDark ? "#374151" : "#E5E7EB"}`,
+                  borderRadius: "6px",
+                  color: chartColors.text
+                }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </CardContent>
