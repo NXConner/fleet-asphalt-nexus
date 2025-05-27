@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
@@ -19,6 +20,7 @@ import EmployeeManagement from "./pages/EmployeeManagement";
 import TimeTracking from "./pages/TimeTracking";
 import Scheduling from "./pages/Scheduling";
 import Invoices from "./pages/Invoices";
+import InvoiceManagement from "./pages/InvoiceManagement";
 import CRM from "./pages/CRM";
 import InventoryManagement from "./pages/InventoryManagement";
 import SafetyCompliance from "./pages/SafetyCompliance";
@@ -106,6 +108,11 @@ function App() {
                   <Route path="/invoices" element={
                     <ProtectedRoute>
                       <Invoices />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/invoice-management" element={
+                    <ProtectedRoute>
+                      <InvoiceManagement />
                     </ProtectedRoute>
                   } />
                   <Route path="/crm" element={

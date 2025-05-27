@@ -18,6 +18,7 @@ export interface Invoice {
   taxRate: number;
   taxAmount: number;
   total: number;
+  balanceRemaining?: number;
   status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
   issueDate: string;
   dueDate: string;
@@ -34,6 +35,7 @@ export interface InvoiceItem {
   description: string;
   quantity: number;
   unitPrice: number;
+  unit?: string;
   total: number;
   taxable: boolean;
 }
@@ -47,3 +49,6 @@ export interface PaymentRecord {
   reference?: string;
   notes?: string;
 }
+
+// Add Payment type alias for backwards compatibility
+export type Payment = PaymentRecord;

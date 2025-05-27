@@ -1,50 +1,72 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Search, Users, Phone, Mail, Building, Calendar } from "lucide-react";
-import { Customer, CustomerInteraction } from "@/types/customer";
+import { Badge } from "@/components/ui/badge";
+import { Search, Plus, Phone, Mail, MapPin, Calendar } from "lucide-react";
+import { Customer } from "@/types/customer";
 
 const CRM = () => {
   const [customers] = useState<Customer[]>([
     {
-      id: "cust-001",
+      id: "CUST-001",
       type: "business",
-      name: "City Municipality",
-      email: "projects@city.gov",
+      name: "ABC Construction Co.",
+      email: "contact@abcconstruction.com",
       phone: "(555) 123-4567",
       address: {
-        street: "100 City Hall Plaza",
-        city: "Downtown",
-        state: "FL",
-        zipCode: "12345"
+        street: "123 Business Park Dr",
+        city: "Richmond",
+        state: "VA",
+        zipCode: "23230"
       },
+      company: "ABC Construction Co.",
       contactPerson: "John Smith",
-      creditLimit: 100000,
+      creditLimit: 50000,
       paymentTerms: "net-30",
       status: "active",
-      notes: "Major client for municipal projects",
-      tags: ["government", "high-value", "regular"],
-      createdAt: "2024-01-01T00:00:00Z",
-      updatedAt: "2024-01-27T10:30:00Z"
-    }
-  ]);
-
-  const [interactions] = useState<CustomerInteraction[]>([
+      notes: "Long-term client, excellent payment history",
+      createdAt: "2024-01-15T00:00:00Z",
+      updatedAt: "2024-01-27T10:30:00Z",
+      projects: [
+        {
+          id: "PROJ-001",
+          title: "Office Complex Parking",
+          type: "paving",
+          status: "completed",
+          estimatedValue: 35000,
+          actualValue: 34500,
+          startDate: "2024-01-10",
+          completionDate: "2024-01-20"
+        }
+      ],
+      totalValue: 34500,
+      lastContact: "2024-01-25T00:00:00Z",
+      tags: ["construction", "commercial", "regular"]
+    },
     {
-      id: "int-001",
-      customerId: "cust-001",
-      type: "meeting",
-      subject: "Q2 Projects Discussion",
-      description: "Discussed upcoming road projects for Q2",
-      outcome: "Received RFQ for 3 projects",
-      nextAction: "Prepare estimates",
-      nextActionDate: "2024-02-05",
-      userId: "user-1",
-      createdAt: "2024-01-25T14:00:00Z"
+      id: "CUST-002",
+      type: "individual",
+      name: "Sarah Johnson",
+      email: "sarah.johnson@email.com",
+      phone: "(555) 987-6543",
+      address: {
+        street: "456 Oak Avenue",
+        city: "Norfolk",
+        state: "VA",
+        zipCode: "23510"
+      },
+      creditLimit: 10000,
+      paymentTerms: "net-15",
+      status: "prospect",
+      notes: "Interested in driveway paving",
+      createdAt: "2024-01-20T00:00:00Z",
+      updatedAt: "2024-01-26T14:20:00Z",
+      projects: [],
+      totalValue: 0,
+      lastContact: "2024-01-26T14:20:00Z",
+      tags: ["residential", "prospect"]
     }
   ]);
 
@@ -55,226 +77,109 @@ const CRM = () => {
     customer.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getStatusColor = (status: Customer['status']) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800';
-      case 'inactive':
-        return 'bg-gray-100 text-gray-800';
-      case 'prospect':
-        return 'bg-blue-100 text-blue-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+      case 'active': return 'bg-green-100 text-green-800';
+      case 'prospect': return 'bg-blue-100 text-blue-800';
+      case 'inactive': return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const stats = {
-    totalCustomers: customers.length,
-    activeCustomers: customers.filter(c => c.status === 'active').length,
-    prospects: customers.filter(c => c.status === 'prospect').length,
-    totalValue: customers.reduce((sum, c) => sum + c.creditLimit, 0)
-  };
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Customer Relationship Management</h1>
-        <p className="text-muted-foreground mt-2">
-          Manage customers, track interactions, and grow your business
-        </p>
-      </div>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Customer Relationship Management</h1>
+            <p className="text-gray-600 mt-2">Manage your customer relationships and interactions</p>
+          </div>
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Customer
+          </Button>
+        </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-blue-600" />
-              <div>
-                <div className="text-2xl font-bold">{stats.totalCustomers}</div>
-                <div className="text-sm text-muted-foreground">Total Customers</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2">
-              <Building className="h-5 w-5 text-green-600" />
-              <div>
-                <div className="text-2xl font-bold">{stats.activeCustomers}</div>
-                <div className="text-sm text-muted-foreground">Active Customers</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-orange-600" />
-              <div>
-                <div className="text-2xl font-bold">{stats.prospects}</div>
-                <div className="text-sm text-muted-foreground">Prospects</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2">
-              <Building className="h-5 w-5 text-purple-600" />
-              <div>
-                <div className="text-2xl font-bold">${stats.totalValue.toLocaleString()}</div>
-                <div className="text-sm text-muted-foreground">Total Credit Limit</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="customers" className="space-y-6">
-        <div className="flex justify-between items-center">
-          <TabsList>
-            <TabsTrigger value="customers">Customers</TabsTrigger>
-            <TabsTrigger value="interactions">Interactions</TabsTrigger>
-            <TabsTrigger value="prospects">Prospects</TabsTrigger>
-          </TabsList>
-          
-          <div className="flex gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search customers..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-64"
-              />
-            </div>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Customer
-            </Button>
+        {/* Search */}
+        <div className="mb-6">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Search customers..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
         </div>
 
-        <TabsContent value="customers" className="space-y-4">
-          <div className="grid gap-4">
-            {filteredCustomers.map((customer) => (
-              <Card key={customer.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-lg">{customer.name}</h3>
-                        <Badge className={getStatusColor(customer.status)} variant="secondary">
-                          {customer.status}
-                        </Badge>
-                        <Badge variant="outline">{customer.type}</Badge>
-                      </div>
-                      <div className="text-sm text-muted-foreground space-y-1">
-                        <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4" />
-                          {customer.email}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Phone className="h-4 w-4" />
-                          {customer.phone}
-                        </div>
-                        <div>Address: {customer.address.street}, {customer.address.city}</div>
-                        {customer.contactPerson && <div>Contact: {customer.contactPerson}</div>}
-                        <div className="flex gap-2 mt-2">
-                          {customer.tags.map((tag) => (
-                            <Badge key={tag} variant="secondary" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="text-right space-y-2">
-                      <div className="text-sm text-muted-foreground">
-                        Credit Limit: ${customer.creditLimit.toLocaleString()}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Terms: {customer.paymentTerms}
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
-                          Edit
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          View History
-                        </Button>
-                        <Button size="sm">
-                          New Estimate
-                        </Button>
-                      </div>
-                    </div>
+        {/* Customer Cards */}
+        <div className="grid gap-6">
+          {filteredCustomers.map((customer) => (
+            <Card key={customer.id} className="hover:shadow-md transition-shadow">
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      {customer.name}
+                      <Badge className={getStatusColor(customer.status)}>
+                        {customer.status.charAt(0).toUpperCase() + customer.status.slice(1)}
+                      </Badge>
+                    </CardTitle>
+                    {customer.company && (
+                      <p className="text-sm text-gray-600 mt-1">{customer.company}</p>
+                    )}
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="interactions" className="space-y-4">
-          <div className="grid gap-4">
-            {interactions.map((interaction) => (
-              <Card key={interaction.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold">{interaction.subject}</h3>
-                        <Badge variant="outline">{interaction.type}</Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{interaction.description}</p>
-                      <div className="text-sm">
-                        <div><strong>Outcome:</strong> {interaction.outcome}</div>
-                        {interaction.nextAction && (
-                          <div><strong>Next Action:</strong> {interaction.nextAction}</div>
-                        )}
-                      </div>
+                  <div className="text-right">
+                    <div className="text-lg font-semibold text-green-600">
+                      ${customer.totalValue.toLocaleString()}
                     </div>
-                    <div className="text-right text-sm text-muted-foreground">
-                      {new Date(interaction.createdAt).toLocaleDateString()}
-                    </div>
+                    <p className="text-sm text-gray-500">Total Value</p>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="prospects" className="space-y-4">
-          <div className="grid gap-4">
-            {filteredCustomers.filter(c => c.status === 'prospect').map((customer) => (
-              <Card key={customer.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-center">
+                </div>
+              </CardHeader>
+              
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-gray-400" />
                     <div>
-                      <h3 className="font-semibold">{customer.name}</h3>
-                      <p className="text-sm text-muted-foreground">{customer.email}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline">
-                        Follow Up
-                      </Button>
-                      <Button size="sm">
-                        Convert to Customer
-                      </Button>
+                      <p className="text-sm text-gray-500">Email</p>
+                      <p className="font-medium">{customer.email}</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+                  
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-gray-400" />
+                    <div>
+                      <p className="text-sm text-gray-500">Phone</p>
+                      <p className="font-medium">{customer.phone}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-gray-400" />
+                    <div>
+                      <p className="text-sm text-gray-500">Location</p>
+                      <p className="font-medium">{customer.address.city}, {customer.address.state}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex justify-between items-center text-sm border-t pt-4">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-500">
+                      Last Contact: {new Date(customer.lastContact).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <span className="text-gray-500">Projects: {customer.projects.length}</span>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
