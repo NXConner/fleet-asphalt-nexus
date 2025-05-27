@@ -1,23 +1,7 @@
-
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Truck, 
-  MapPin, 
-  Users, 
-  Wrench, 
-  Calendar,
-  DollarSign,
-  TrendingUp,
-  AlertTriangle,
-  Fuel,
-  Clock,
-  Route,
-  Activity
-} from "lucide-react";
+import { FleetOverviewStats } from "./FleetOverviewStats";
+import { FleetStatusTab } from "./FleetStatusTab";
 
 interface FleetVehicle {
   id: string;
@@ -195,62 +179,17 @@ export function FleetFocusIntegration() {
   };
 
   const activeVehicles = vehicles.filter(v => v.status === 'active').length;
-  const maintenanceVehicles = vehicles.filter(v => v.status === 'maintenance').length;
   const criticalAlerts = maintenanceAlerts.filter(a => a.type === 'critical').length;
   const avgFuelLevel = Math.round(vehicles.reduce((sum, v) => sum + v.fuelLevel, 0) / vehicles.length);
 
   return (
     <div className="space-y-6">
-      {/* Fleet Overview Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Truck className="h-5 w-5 text-blue-600" />
-              <div>
-                <div className="text-2xl font-bold">{vehicles.length}</div>
-                <div className="text-sm text-muted-foreground">Total Fleet</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-green-600" />
-              <div>
-                <div className="text-2xl font-bold">{activeVehicles}</div>
-                <div className="text-sm text-muted-foreground">Active Now</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-orange-600" />
-              <div>
-                <div className="text-2xl font-bold">{criticalAlerts}</div>
-                <div className="text-sm text-muted-foreground">Critical Alerts</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Fuel className="h-5 w-5 text-purple-600" />
-              <div>
-                <div className="text-2xl font-bold">{avgFuelLevel}%</div>
-                <div className="text-sm text-muted-foreground">Avg Fuel Level</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <FleetOverviewStats 
+        totalVehicles={vehicles.length}
+        activeVehicles={activeVehicles}
+        criticalAlerts={criticalAlerts}
+        avgFuelLevel={avgFuelLevel}
+      />
 
       <Tabs defaultValue="fleet" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
@@ -261,64 +200,7 @@ export function FleetFocusIntegration() {
         </TabsList>
 
         <TabsContent value="fleet" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Truck className="h-5 w-5" />
-                Real-Time Fleet Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {vehicles.map((vehicle) => (
-                  <div key={vehicle.id} className="p-4 border rounded-lg">
-                    <div className="flex justify-between items-start mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-100 rounded-lg">
-                          <Truck className="h-4 w-4 text-blue-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">{vehicle.name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {vehicle.id} • {vehicle.driver || 'Unassigned'}
-                          </p>
-                        </div>
-                      </div>
-                      <Badge className={getStatusColor(vehicle.status)}>
-                        {vehicle.status}
-                      </Badge>
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span>{vehicle.location.address}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Fuel className="h-4 w-4 text-muted-foreground" />
-                        <span>{vehicle.fuelLevel}% fuel</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Activity className="h-4 w-4 text-muted-foreground" />
-                        <span>{vehicle.speed} mph</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span>{formatTimestamp(vehicle.location.lastUpdate)}</span>
-                      </div>
-                    </div>
-
-                    {vehicle.route && (
-                      <div className="mt-2 text-sm text-blue-600 flex items-center gap-2">
-                        <Route className="h-4 w-4" />
-                        {vehicle.route}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <FleetStatusTab vehicles={vehicles} />
         </TabsContent>
 
         <TabsContent value="maintenance" className="space-y-4">
