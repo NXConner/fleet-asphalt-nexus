@@ -8,6 +8,8 @@ import Navigation from "./components/Navigation";
 import Dashboard from "./pages/Dashboard";
 import FleetManagement from "./pages/FleetManagement";
 import Estimates from "./pages/Estimates";
+import Jobs from "./pages/Jobs";
+import Invoices from "./pages/Invoices";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,8 +27,8 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/fleet" element={<FleetManagement />} />
             <Route path="/estimates" element={<Estimates />} />
-            <Route path="/jobs" element={<div className="p-6"><h1 className="text-2xl font-bold">Jobs - Coming Soon</h1></div>} />
-            <Route path="/invoices" element={<div className="p-6"><h1 className="text-2xl font-bold">Invoices - Coming Soon</h1></div>} />
+            <Route path="/jobs" element={<Jobs />} />
+            <Route path="/invoices" element={<Invoices />} />
             <Route path="/settings" element={<div className="p-6"><h1 className="text-2xl font-bold">Settings - Coming Soon</h1></div>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
