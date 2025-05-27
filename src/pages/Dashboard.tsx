@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import StatsGrid from "@/components/dashboard/StatsGrid";
 import UpcomingJobs from "@/components/dashboard/UpcomingJobs";
@@ -14,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Calculator, Briefcase, TrendingUp, Truck, Users, DollarSign, Clock, MapPin } from "lucide-react";
 import { Job } from "@/types/job";
 import { Driver } from "@/types/driver";
+import { FleetFocusIntegration } from "@/components/fleet/FleetFocusIntegration";
 
 const Dashboard = () => {
   // Mock data for demonstration
@@ -326,9 +326,10 @@ const Dashboard = () => {
       <StatsGrid stats={stats} />
 
       <Tabs defaultValue="overview" className="mt-8">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="fleet">Fleet Management</TabsTrigger>
+          <TabsTrigger value="fleet-focus">Fleet Focus</TabsTrigger>
           <TabsTrigger value="tracking">Employee Tracking</TabsTrigger>
           <TabsTrigger value="optimization">Optimization</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
@@ -353,6 +354,10 @@ const Dashboard = () => {
             <ResourceAllocation resources={mockResources} />
             <DriverManagement drivers={mockDrivers} onDriverSelect={handleDriverSelect} />
           </div>
+        </TabsContent>
+
+        <TabsContent value="fleet-focus" className="mt-6">
+          <FleetFocusIntegration />
         </TabsContent>
 
         <TabsContent value="tracking" className="mt-6">
