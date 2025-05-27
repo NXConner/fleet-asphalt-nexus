@@ -2,21 +2,27 @@
 export interface Invoice {
   id: string;
   invoiceNumber: string;
+  customerId: string;
+  customerName: string;
+  customerEmail: string;
+  customerAddress: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  };
   estimateId?: string;
   jobId?: string;
-  customerId: string;
-  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
   items: InvoiceItem[];
   subtotal: number;
   taxRate: number;
   taxAmount: number;
   total: number;
-  amountPaid: number;
-  balanceRemaining: number;
+  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
   issueDate: string;
   dueDate: string;
   paidDate?: string;
-  paymentMethod?: 'cash' | 'check' | 'credit-card' | 'bank-transfer' | 'financing';
+  paymentMethod?: string;
   notes?: string;
   terms: string;
   createdAt: string;
@@ -27,18 +33,17 @@ export interface InvoiceItem {
   id: string;
   description: string;
   quantity: number;
-  unit: string;
   unitPrice: number;
   total: number;
+  taxable: boolean;
 }
 
-export interface Payment {
+export interface PaymentRecord {
   id: string;
   invoiceId: string;
   amount: number;
-  method: 'cash' | 'check' | 'credit-card' | 'bank-transfer';
+  paymentDate: string;
+  paymentMethod: 'cash' | 'check' | 'credit_card' | 'bank_transfer' | 'other';
   reference?: string;
-  date: string;
   notes?: string;
-  createdAt: string;
 }

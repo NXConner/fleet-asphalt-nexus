@@ -18,6 +18,11 @@ export interface Customer {
   projects: CustomerProject[];
   totalValue: number;
   lastContact: string;
+  type: 'individual' | 'business';
+  contactPerson?: string;
+  creditLimit: number;
+  paymentTerms: string;
+  tags: string[];
 }
 
 export interface CustomerProject {
@@ -40,4 +45,17 @@ export interface CustomerContact {
   date: string;
   followUpRequired: boolean;
   followUpDate?: string;
+}
+
+export interface CustomerInteraction {
+  id: string;
+  customerId: string;
+  type: 'email' | 'phone' | 'meeting' | 'site-visit';
+  subject: string;
+  description: string;
+  outcome: string;
+  nextAction?: string;
+  nextActionDate?: string;
+  userId: string;
+  createdAt: string;
 }

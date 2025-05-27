@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import EstimatesHeader from "@/components/estimates/EstimatesHeader";
@@ -17,6 +18,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 const Estimates = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     dateRange: { from: '', to: '' },
     status: [],
@@ -61,6 +63,11 @@ const Estimates = () => {
     }
   ]);
 
+  const handleNewEstimate = () => {
+    // This would open the estimate form
+    toast.info("New estimate form opening...");
+  };
+
   const handleStatusChange = (id: string, status: string) => {
     setEstimates(estimates.map(est => 
       est.id === id ? { ...est, status } : est
@@ -103,10 +110,10 @@ const Estimates = () => {
   };
 
   const filteredEstimates = estimates.filter(estimate => {
-    const matchesSearch = !filters.searchTerm || 
-      estimate.clientName.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-      estimate.projectType.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-      estimate.id.toLowerCase().includes(filters.searchTerm.toLowerCase());
+    const matchesSearch = !searchTerm || 
+      estimate.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      estimate.projectType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      estimate.id.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = filters.status.length === 0 || filters.status.includes(estimate.status);
     const matchesProjectType = filters.projectType.length === 0 || filters.projectType.includes(estimate.projectType);
@@ -120,6 +127,13 @@ const Estimates = () => {
   const totalValue = estimates.reduce((sum, est) => sum + est.amount, 0);
   const pendingCount = estimates.filter(est => est.status === "Pending").length;
   const approvedCount = estimates.filter(est => est.status === "Approved").length;
+
+  const stats = {
+    total: estimates.length,
+    pending: pendingCount,
+    approved: approvedCount,
+    totalValue: totalValue
+  };
 
   const exportFields = [
     { key: 'id', label: 'Estimate ID' },
@@ -138,7 +152,11 @@ const Estimates = () => {
       <div className="min-h-screen bg-gray-50 p-4 md:p-6">
         <div className="max-w-7xl mx-auto space-y-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <EstimatesHeader />
+            <EstimatesHeader 
+              onNewEstimate={handleNewEstimate}
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+            />
             <Dialog>
               <DialogTrigger asChild>
                 <Button className="w-full sm:w-auto">
@@ -152,12 +170,7 @@ const Estimates = () => {
             </Dialog>
           </div>
 
-          <EstimatesStats
-            totalEstimates={estimates.length}
-            pendingCount={pendingCount}
-            approvedCount={approvedCount}
-            totalValue={totalValue}
-          />
+          <EstimatesStats stats={stats} />
 
           <Tabs defaultValue="estimates" className="space-y-6">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">

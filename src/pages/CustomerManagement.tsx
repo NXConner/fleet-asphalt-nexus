@@ -36,7 +36,12 @@ const CustomerManagement = () => {
         }
       ],
       totalValue: 24500,
-      lastContact: "2024-01-25T00:00:00Z"
+      lastContact: "2024-01-25T00:00:00Z",
+      type: "business",
+      contactPerson: "John Smith",
+      creditLimit: 50000,
+      paymentTerms: "net-30",
+      tags: ["regular", "construction"]
     },
     {
       id: "CUST-002",
@@ -55,7 +60,11 @@ const CustomerManagement = () => {
       status: "prospect",
       projects: [],
       totalValue: 0,
-      lastContact: "2024-01-26T14:20:00Z"
+      lastContact: "2024-01-26T14:20:00Z",
+      type: "individual",
+      creditLimit: 10000,
+      paymentTerms: "net-15",
+      tags: ["prospect", "residential"]
     }
   ]);
 
@@ -73,7 +82,32 @@ const CustomerManagement = () => {
       toast.success("Customer updated successfully");
     } else {
       // Add new customer
-      setCustomers(prev => [...prev, customerData as Customer]);
+      const newCustomer: Customer = {
+        id: `CUST-${String(customers.length + 1).padStart(3, '0')}`,
+        name: customerData.name || '',
+        email: customerData.email || '',
+        phone: customerData.phone || '',
+        address: customerData.address || {
+          street: '',
+          city: '',
+          state: '',
+          zipCode: ''
+        },
+        company: customerData.company,
+        notes: customerData.notes,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: customerData.status || 'prospect',
+        projects: [],
+        totalValue: 0,
+        lastContact: new Date().toISOString(),
+        type: customerData.type || 'individual',
+        contactPerson: customerData.contactPerson,
+        creditLimit: customerData.creditLimit || 5000,
+        paymentTerms: customerData.paymentTerms || 'net-15',
+        tags: customerData.tags || []
+      };
+      setCustomers(prev => [...prev, newCustomer]);
       toast.success("Customer created successfully");
     }
     
