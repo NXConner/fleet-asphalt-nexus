@@ -1,19 +1,9 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
-interface Estimate {
-  id: string;
-  clientName: string;
-  projectType: string;
-  location: string;
-  amount: number;
-  status: string;
-  date: string;
-  expiryDate: string;
-  description: string;
-}
+import { Eye, Edit, Trash2, Send } from "lucide-react";
+import { Estimate } from "@/types/estimate";
 
 interface EstimatesListProps {
   estimates: Estimate[];
@@ -22,78 +12,89 @@ interface EstimatesListProps {
 const EstimatesList = ({ estimates }: EstimatesListProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Approved":
-        return "bg-green-100 text-green-800";
-      case "Pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "Draft":
-        return "bg-gray-100 text-gray-800";
-      case "Rejected":
-        return "bg-red-100 text-red-800";
+      case 'approved':
+        return 'bg-green-100 text-green-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'rejected':
+        return 'bg-red-100 text-red-800';
+      case 'draft':
+        return 'bg-gray-100 text-gray-800';
       default:
-        return "bg-gray-100 text-gray-800";
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
+  if (estimates.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500 text-lg mb-4">No estimates found</p>
+        <p className="text-gray-400">Create your first estimate to get started</p>
+      </div>
+    );
+  }
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>All Estimates ({estimates.length})</CardTitle>
-        <CardDescription>Track and manage your project estimates</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {estimates.map((estimate) => (
-            <div key={estimate.id} className="p-6 border rounded-lg hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start mb-4">
+    <div className="grid gap-6">
+      {estimates.map((estimate) => (
+        <Card key={estimate.id} className="hover:shadow-md transition-shadow">
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle className="text-lg">{estimate.title}</CardTitle>
+                <p className="text-sm text-gray-600 mt-1">
+                  {estimate.client.name} • {estimate.project.location}
+                </p>
+              </div>
+              <Badge className={getStatusColor(estimate.status)}>
+                {estimate.status.charAt(0).toUpperCase() + estimate.status.slice(1)}
+              </Badge>
+            </div>
+          </CardHeader>
+          
+          <CardContent>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+              <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold">{estimate.clientName}</h3>
-                    <Badge className={getStatusColor(estimate.status)}>
-                      {estimate.status}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-gray-600">{estimate.id} • {estimate.projectType}</p>
+                  <span className="text-gray-500">Project Type:</span>
+                  <p className="font-medium capitalize">{estimate.project.type}</p>
                 </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-green-600">
-                    ${estimate.amount.toLocaleString()}
-                  </div>
-                  <p className="text-sm text-gray-500">Estimated value</p>
+                <div>
+                  <span className="text-gray-500">Total Cost:</span>
+                  <p className="font-medium text-lg">${estimate.calculations.totalCost.toLocaleString()}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Area:</span>
+                  <p className="font-medium">{estimate.project.area.toLocaleString()} sq ft</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Valid Until:</span>
+                  <p className="font-medium">{new Date(estimate.validUntil).toLocaleDateString()}</p>
                 </div>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-700">Location</p>
-                  <p className="text-sm text-gray-600">{estimate.location}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-700">Created</p>
-                  <p className="text-sm text-gray-600">{estimate.date}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-700">Expires</p>
-                  <p className="text-sm text-gray-600">{estimate.expiryDate}</p>
-                </div>
-              </div>
-              
-              <p className="text-sm text-gray-600 mb-4">{estimate.description}</p>
               
               <div className="flex gap-2">
-                <Button size="sm">View Details</Button>
-                <Button variant="outline" size="sm">Edit</Button>
-                {estimate.status === "Approved" && (
-                  <Button variant="outline" size="sm" className="text-green-600 border-green-200">
-                    Convert to Job
-                  </Button>
-                )}
+                <Button variant="outline" size="sm">
+                  <Eye className="h-4 w-4 mr-1" />
+                  View
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Send className="h-4 w-4 mr-1" />
+                  Send
+                </Button>
+                <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   );
 };
 

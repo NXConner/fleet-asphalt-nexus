@@ -1,7 +1,6 @@
 
 export interface Customer {
   id: string;
-  type: 'individual' | 'business' | 'government';
   name: string;
   email: string;
   phone: string;
@@ -11,26 +10,34 @@ export interface Customer {
     state: string;
     zipCode: string;
   };
-  contactPerson?: string;
-  taxId?: string;
-  creditLimit: number;
-  paymentTerms: 'net-15' | 'net-30' | 'net-60' | 'due-on-receipt';
-  status: 'active' | 'inactive' | 'prospect';
-  notes: string;
-  tags: string[];
+  company?: string;
+  notes?: string;
   createdAt: string;
   updatedAt: string;
+  status: 'active' | 'inactive' | 'prospect';
+  projects: CustomerProject[];
+  totalValue: number;
+  lastContact: string;
 }
 
-export interface CustomerInteraction {
+export interface CustomerProject {
+  id: string;
+  title: string;
+  type: 'paving' | 'maintenance' | 'striping' | 'sealcoating' | 'patching';
+  status: 'quoted' | 'scheduled' | 'in-progress' | 'completed' | 'cancelled';
+  estimatedValue: number;
+  actualValue?: number;
+  startDate?: string;
+  completionDate?: string;
+}
+
+export interface CustomerContact {
   id: string;
   customerId: string;
-  type: 'call' | 'email' | 'meeting' | 'proposal' | 'follow-up';
+  type: 'email' | 'phone' | 'meeting' | 'site-visit';
   subject: string;
-  description: string;
-  outcome: string;
-  nextAction?: string;
-  nextActionDate?: string;
-  userId: string;
-  createdAt: string;
+  notes: string;
+  date: string;
+  followUpRequired: boolean;
+  followUpDate?: string;
 }

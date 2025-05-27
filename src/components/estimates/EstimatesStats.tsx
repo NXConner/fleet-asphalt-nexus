@@ -1,58 +1,56 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Clock, Calculator, DollarSign } from "lucide-react";
+import { DollarSign, FileText, Clock, CheckCircle } from "lucide-react";
 
-interface EstimatesStatsProps {
-  totalEstimates: number;
-  pendingCount: number;
-  approvedCount: number;
-  totalValue: number;
+export interface EstimatesStatsProps {
+  stats: {
+    total: number;
+    pending: number;
+    approved: number;
+    totalValue: number;
+  };
 }
 
-const EstimatesStats = ({ totalEstimates, pendingCount, approvedCount, totalValue }: EstimatesStatsProps) => {
+const EstimatesStats = ({ stats }: EstimatesStatsProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Estimates</CardTitle>
-          <FileText className="h-4 w-4 text-blue-600" />
+          <FileText className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{totalEstimates}</div>
-          <p className="text-xs text-muted-foreground">Active proposals</p>
+          <div className="text-2xl font-bold">{stats.total}</div>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Pending Approval</CardTitle>
-          <Clock className="h-4 w-4 text-yellow-600" />
+          <CardTitle className="text-sm font-medium">Pending</CardTitle>
+          <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{pendingCount}</div>
-          <p className="text-xs text-muted-foreground">Awaiting client response</p>
+          <div className="text-2xl font-bold">{stats.pending}</div>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Approved</CardTitle>
-          <Calculator className="h-4 w-4 text-green-600" />
+          <CheckCircle className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{approvedCount}</div>
-          <p className="text-xs text-muted-foreground">Ready to convert</p>
+          <div className="text-2xl font-bold">{stats.approved}</div>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Value</CardTitle>
-          <DollarSign className="h-4 w-4 text-purple-600" />
+          <DollarSign className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">${totalValue.toLocaleString()}</div>
-          <p className="text-xs text-muted-foreground">Potential revenue</p>
+          <div className="text-2xl font-bold">${stats.totalValue.toLocaleString()}</div>
         </CardContent>
       </Card>
     </div>
