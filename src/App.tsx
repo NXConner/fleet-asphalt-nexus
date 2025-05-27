@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,6 +26,8 @@ import TimeTracking from "./pages/TimeTracking";
 import RealTimeGPS from "./pages/RealTimeGPS";
 import NotFound from "./pages/NotFound";
 import { MobileOptimizedLayout } from "./components/mobile/MobileOptimizedLayout";
+import EmployeeManagement from "./pages/EmployeeManagement";
+import AccountingPlatform from "./pages/AccountingPlatform";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +65,8 @@ const App = () => (
                     <Route path="/documents" element={<DocumentManagement />} />
                     <Route path="/time-tracking" element={<TimeTracking />} />
                     <Route path="/gps" element={<RealTimeGPS />} />
+                    <Route path="/employee-management" element={<EmployeeManagement />} />
+                    <Route path="/accounting" element={<AccountingPlatform />} />
                     <Route path="/settings" element={<div className="p-6"><h1 className="text-2xl font-bold">Settings - Coming Soon</h1></div>} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>

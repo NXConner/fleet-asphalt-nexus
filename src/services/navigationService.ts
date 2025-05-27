@@ -48,6 +48,18 @@ export class NavigationService {
         title: "Business Management",
         links: [
           {
+            path: "/employee-management",
+            label: "Employee Management",
+            icon: "Users",
+            description: "Comprehensive HR solution"
+          },
+          {
+            path: "/accounting",
+            label: "Accounting Platform",
+            icon: "FileText",
+            description: "Financial management solution"
+          },
+          {
             path: "/estimates",
             label: "Estimates",
             icon: "Calculator",
@@ -143,16 +155,16 @@ export class NavigationService {
         description: "Create project estimate"
       },
       {
-        path: "/fleet?view=live",
-        label: "Fleet Status",
-        icon: "Truck",
-        description: "View live fleet status"
+        path: "/employee-management?action=new",
+        label: "Add Employee",
+        icon: "UserPlus",
+        description: "Add a new employee"
       },
       {
-        path: "/maintenance?action=schedule",
-        label: "Schedule Maintenance",
-        icon: "Wrench",
-        description: "Schedule vehicle maintenance"
+        path: "/accounting?action=new-invoice",
+        label: "Create Invoice",
+        icon: "FileText",
+        description: "Create a new invoice"
       }
     ];
   }
