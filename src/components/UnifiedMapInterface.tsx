@@ -237,8 +237,13 @@ export const UnifiedMapInterface = () => {
 
   const enabledLayers = layers.filter(layer => layer.enabled);
   const filteredMarkers = mockMarkers.filter(marker => {
-    const layerType = marker.type + 's';
-    return enabledLayers.some(layer => layer.type === layerType || layer.type === marker.type);
+    return enabledLayers.some(layer => {
+      if (layer.type === 'employees' && marker.type === 'employee') return true;
+      if (layer.type === 'vehicles' && marker.type === 'vehicle') return true;
+      if (layer.type === 'jobs' && marker.type === 'job') return true;
+      if (layer.type === 'routes' && marker.type === 'route') return true;
+      return false;
+    });
   });
 
   const replayPositions = getCurrentReplayPositions();
