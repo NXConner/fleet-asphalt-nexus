@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -48,7 +47,7 @@ export function DocumentUpload({ employeeId, documents, onDocumentUpload }: Docu
   };
 
   const downloadDocument = (document: Document) => {
-    const link = document.createElement('a');
+    const link = window.document.createElement('a');
     link.href = document.url;
     link.download = document.name;
     link.click();
