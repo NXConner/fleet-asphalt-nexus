@@ -1,188 +1,127 @@
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Truck, Wrench, MapPin, AlertTriangle } from "lucide-react";
-import AddVehicleForm from "@/components/AddVehicleForm";
-import SearchFilter from "@/components/SearchFilter";
-import VehicleDetails from "@/components/VehicleDetails";
+import { Plus, Filter } from "lucide-react";
+import { FleetStats } from "@/components/fleet/FleetStats";
+import { VehicleList } from "@/components/fleet/VehicleList";
+import { Vehicle } from "@/types/fleet";
+
+// Mock data - in a real app, this would come from your backend
+const mockVehicles: Vehicle[] = [
+  {
+    id: "1",
+    type: "truck",
+    make: "Ford",
+    model: "F-350",
+    year: 2022,
+    licensePlate: "FL-ASP-123",
+    vin: "1FDRF3G69NEA12345",
+    status: "active",
+    location: {
+      latitude: 28.5383,
+      longitude: -81.3792,
+      address: "Orlando, FL",
+      lastUpdated: "2024-01-27T10:30:00Z"
+    },
+    mileage: 25000,
+    fuelLevel: 85,
+    assignedDriver: "driver-1",
+    maintenanceSchedule: [],
+    documents: [],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-27T10:30:00Z"
+  },
+  {
+    id: "2",
+    type: "paver",
+    make: "Caterpillar",
+    model: "AP555F",
+    year: 2021,
+    licensePlate: "FL-ASP-124",
+    vin: "CAT123456789012345",
+    status: "maintenance",
+    location: {
+      latitude: 28.5383,
+      longitude: -81.3792,
+      address: "Maintenance Facility, Orlando, FL",
+      lastUpdated: "2024-01-26T15:45:00Z"
+    },
+    mileage: 1200,
+    fuelLevel: 45,
+    maintenanceSchedule: [],
+    documents: [],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-26T15:45:00Z"
+  }
+];
 
 const FleetManagement = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [vehicles] = useState<Vehicle[]>(mockVehicles);
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
 
-  const vehicles = [
-    {
-      id: "FL-001",
-      name: "Dump Truck Alpha",
-      type: "Dump Truck",
-      status: "Active",
-      location: "Main Yard",
-      mileage: "45,230",
-      nextMaintenance: "2024-06-15",
-      driver: "John Smith"
-    },
-    {
-      id: "FL-002",
-      name: "Paver Beta",
-      type: "Asphalt Paver",
-      status: "In Use",
-      location: "Oak Street Project",
-      mileage: "32,150",
-      nextMaintenance: "2024-06-20",
-      driver: "Mike Johnson"
-    },
-    {
-      id: "FL-003",
-      name: "Roller Gamma",
-      type: "Road Roller",
-      status: "Maintenance",
-      location: "Service Center",
-      mileage: "28,900",
-      nextMaintenance: "Overdue",
-      driver: "Unassigned"
-    }
-  ];
+  const fleetStats = {
+    totalVehicles: vehicles.length,
+    activeVehicles: vehicles.filter(v => v.status === 'active').length,
+    driversOnDuty: vehicles.filter(v => v.assignedDriver).length,
+    vehiclesInMaintenance: vehicles.filter(v => v.status === 'maintenance').length
+  };
 
-  const filterOptions = [
-    { value: "Active", label: "Active" },
-    { value: "In Use", label: "In Use" },
-    { value: "Maintenance", label: "Maintenance" }
-  ];
-
-  const filteredVehicles = vehicles.filter(vehicle => {
-    const matchesSearch = vehicle.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         vehicle.driver.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         vehicle.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = statusFilter === "all" || vehicle.status === statusFilter;
-    return matchesSearch && matchesFilter;
-  });
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Active":
-        return "text-green-600 bg-green-100";
-      case "In Use":
-        return "text-blue-600 bg-blue-100";
-      case "Maintenance":
-        return "text-red-600 bg-red-100";
-      default:
-        return "text-gray-600 bg-gray-100";
-    }
+  const handleVehicleSelect = (vehicle: Vehicle) => {
+    setSelectedVehicle(vehicle);
+    console.log('Selected vehicle:', vehicle);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Fleet Management</h1>
-            <p className="text-gray-600 mt-2">Manage your vehicles, maintenance, and drivers</p>
-          </div>
-          <AddVehicleForm />
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold">Fleet Management</h1>
+          <p className="text-muted-foreground mt-2">
+            Monitor and manage your asphalt equipment fleet
+          </p>
         </div>
+        <div className="flex gap-2">
+          <Button variant="outline">
+            <Filter className="h-4 w-4 mr-2" />
+            Filter
+          </Button>
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Vehicle
+          </Button>
+        </div>
+      </div>
 
-        {/* Fleet Overview Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <FleetStats stats={fleetStats} />
+
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <VehicleList vehicles={vehicles} onVehicleSelect={handleVehicleSelect} />
+        </div>
+        
+        <div>
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Vehicles</CardTitle>
-              <Truck className="h-4 w-4 text-blue-600" />
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+              <CardDescription>Common fleet management tasks</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">24</div>
-              <p className="text-xs text-muted-foreground">2 added this month</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Vehicles</CardTitle>
-              <MapPin className="h-4 w-4 text-green-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">18</div>
-              <p className="text-xs text-muted-foreground">75% utilization rate</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Maintenance Due</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-orange-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">3</div>
-              <p className="text-xs text-muted-foreground">Schedule maintenance</p>
+            <CardContent className="space-y-2">
+              <Button variant="outline" className="w-full justify-start">
+                Schedule Maintenance
+              </Button>
+              <Button variant="outline" className="w-full justify-start">
+                Assign Drivers
+              </Button>
+              <Button variant="outline" className="w-full justify-start">
+                Generate Reports
+              </Button>
+              <Button variant="outline" className="w-full justify-start">
+                Track Fuel Usage
+              </Button>
             </CardContent>
           </Card>
         </div>
-
-        {/* Search and Filter */}
-        <SearchFilter
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          filterValue={statusFilter}
-          onFilterChange={setStatusFilter}
-          filterOptions={filterOptions}
-          placeholder="Search vehicles by name, driver, or ID..."
-        />
-
-        {/* Vehicle List */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Vehicle Fleet ({filteredVehicles.length})</CardTitle>
-            <CardDescription>Overview of all vehicles in your fleet</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {filteredVehicles.map((vehicle) => (
-                <div key={vehicle.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                  <div className="flex items-center gap-4">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <Truck className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">{vehicle.name}</h3>
-                      <p className="text-sm text-gray-500">{vehicle.id} • {vehicle.type}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-8">
-                    <div className="text-center">
-                      <p className="text-sm font-medium">Status</p>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(vehicle.status)}`}>
-                        {vehicle.status}
-                      </span>
-                    </div>
-                    
-                    <div className="text-center">
-                      <p className="text-sm font-medium">Location</p>
-                      <p className="text-sm text-gray-500">{vehicle.location}</p>
-                    </div>
-                    
-                    <div className="text-center">
-                      <p className="text-sm font-medium">Mileage</p>
-                      <p className="text-sm text-gray-500">{vehicle.mileage} mi</p>
-                    </div>
-                    
-                    <div className="text-center">
-                      <p className="text-sm font-medium">Driver</p>
-                      <p className="text-sm text-gray-500">{vehicle.driver}</p>
-                    </div>
-                    
-                    <VehicleDetails vehicle={vehicle}>
-                      <Button variant="outline" size="sm">
-                        <Wrench className="h-4 w-4 mr-2" />
-                        Details
-                      </Button>
-                    </VehicleDetails>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
