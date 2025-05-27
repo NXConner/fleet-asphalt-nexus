@@ -1,8 +1,7 @@
-
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-interface HoverRevealProps extends React.HTMLAttributes<HTMLDivElement> {
+interface HoverRevealProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'content'> {
   variant?: "slide" | "fade" | "scale" | "rotate" | "flip";
   direction?: "up" | "down" | "left" | "right";
   speed?: "fast" | "normal" | "slow";
@@ -248,4 +247,168 @@ const TiltEffect = React.forwardRef<HTMLDivElement, TiltEffectProps>(
 
 TiltEffect.displayName = "TiltEffect";
 
-export { HoverReveal, MagneticEffect, RippleEffect, TiltEffect };
+interface FloatingElementProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: "bubble" | "orbit" | "drift" | "bounce";
+  speed?: "slow" | "normal" | "fast";
+  direction?: "up" | "down" | "left" | "right" | "random";
+  distance?: "small" | "medium" | "large";
+  children: React.ReactNode;
+}
+
+const FloatingElement = React.forwardRef<HTMLDivElement, FloatingElementProps>(
+  ({ 
+    className, 
+    variant = "drift",
+    speed = "normal",
+    direction = "random",
+    distance = "medium",
+    children,
+    ...props 
+  }, ref) => {
+    const elementRef = React.useRef<HTMLDivElement>(null);
+    
+    React.useImperativeHandle(ref, () => elementRef.current!);
+
+    const speedValues = {
+      slow: 4000,
+      normal: 2000,
+      fast: 1000,
+    };
+
+    const distanceValues = {
+      small: 10,
+      medium: 20,
+      large: 30,
+    };
+
+    React.useEffect(() => {
+      const element = elementRef.current;
+      if (!element) return;
+
+      let animationId: number;
+      let startTime: number;
+
+      const animate = (timestamp: number) => {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const progress = (elapsed % speedValues[speed]) / speedValues[speed];
+
+        const distance = distanceValues[distance];
+        let x = 0;
+        let y = 0;
+
+        switch (variant) {
+          case "bubble":
+            y = Math.sin(progress * Math.PI * 2) * distance;
+            break;
+          case "orbit":
+            x = Math.cos(progress * Math.PI * 2) * distance;
+            y = Math.sin(progress * Math.PI * 2) * distance;
+            break;
+          case "drift":
+            x = Math.sin(progress * Math.PI * 2) * distance * 0.5;
+            y = Math.cos(progress * Math.PI * 2 * 0.7) * distance;
+            break;
+          case "bounce":
+            y = Math.abs(Math.sin(progress * Math.PI * 4)) * distance;
+            break;
+        }
+
+        if (direction === "up") y = -Math.abs(y);
+        if (direction === "down") y = Math.abs(y);
+        if (direction === "left") x = -Math.abs(x);
+        if (direction === "right") x = Math.abs(x);
+
+        element.style.transform = `translate(${x}px, ${y}px)`;
+        animationId = requestAnimationFrame(animate);
+      };
+
+      animationId = requestAnimationFrame(animate);
+
+      return () => {
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+        }
+      };
+    }, [variant, speed, direction, distance]);
+
+    return (
+      <div
+        ref={elementRef}
+        className={cn("transition-transform duration-300 ease-out", className)}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+
+FloatingElement.displayName = "FloatingElement";
+
+interface GlitchEffectProps extends React.HTMLAttributes<HTMLDivElement> {
+  intensity?: "subtle" | "normal" | "extreme";
+  speed?: "slow" | "normal" | "fast";
+  children: React.ReactNode;
+}
+
+const GlitchEffect = React.forwardRef<HTMLDivElement, GlitchEffectProps>(
+  ({ className, intensity = "normal", speed = "normal", children, ...props }, ref) => {
+    const [isGlitching, setIsGlitching] = React.useState(false);
+
+    const intensityValues = {
+      subtle: 2,
+      normal: 5,
+      extreme: 10,
+    };
+
+    const speedValues = {
+      slow: 3000,
+      normal: 2000,
+      fast: 1000,
+    };
+
+    React.useEffect(() => {
+      const interval = setInterval(() => {
+        setIsGlitching(true);
+        setTimeout(() => setIsGlitching(false), 100);
+      }, speedValues[speed]);
+
+      return () => clearInterval(interval);
+    }, [speed]);
+
+    const glitchStyle = isGlitching ? {
+      transform: `translate(${Math.random() * intensityValues[intensity] - intensityValues[intensity]/2}px, ${Math.random() * intensityValues[intensity] - intensityValues[intensity]/2}px)`,
+      filter: `hue-rotate(${Math.random() * 360}deg)`,
+    } : {};
+
+    return (
+      <div
+        ref={ref}
+        className={cn("transition-all duration-100", className)}
+        style={glitchStyle}
+        {...props}
+      >
+        {children}
+        {isGlitching && (
+          <>
+            <div className="absolute inset-0 bg-red-500/20 mix-blend-multiply" />
+            <div className="absolute inset-0 bg-blue-500/20 mix-blend-multiply translate-x-1" />
+            <div className="absolute inset-0 bg-green-500/20 mix-blend-multiply -translate-x-1" />
+          </>
+        )}
+      </div>
+    );
+  }
+);
+
+GlitchEffect.displayName = "GlitchEffect";
+
+export { 
+  HoverReveal, 
+  MagneticEffect, 
+  RippleEffect, 
+  TiltEffect, 
+  FloatingElement,
+  GlitchEffect 
+};

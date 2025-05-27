@@ -10,6 +10,7 @@ import { AnimationPresets, ScrollAnimation } from "./animation-presets";
 import { PremiumButton } from "./premium-button";
 import { AdvancedCard } from "./advanced-card";
 import { InteractiveBackground } from "./interactive-background";
+import { FloatingElement, GlitchEffect } from "./micro-interactions";
 import { Sparkles, Zap, Palette, Rocket } from "lucide-react";
 
 export function ThemeShowcase() {
@@ -49,12 +50,20 @@ export function ThemeShowcase() {
           </div>
         </ScrollAnimation>
 
-        {/* Interactive Shapes */}
+        {/* Interactive Shapes with Floating Elements */}
         <ScrollAnimation animation="slide-up" className="flex justify-center items-center gap-8 py-12">
-          <MorphingShape variant="blob" color="gradient" animation="morph" interactive />
-          <MorphingShape variant="star" color="rainbow" animation="rotate" interactive />
-          <MorphingShape variant="spiral" color="primary" animation="pulse" interactive />
-          <MorphingShape variant="heart" color="accent" animation="float" interactive />
+          <FloatingElement variant="orbit" speed="slow" distance="medium">
+            <MorphingShape variant="blob" color="gradient" animation="morph" interactive />
+          </FloatingElement>
+          <FloatingElement variant="bounce" speed="normal" distance="small">
+            <MorphingShape variant="star" color="rainbow" animation="rotate" interactive />
+          </FloatingElement>
+          <FloatingElement variant="drift" speed="fast" distance="large">
+            <MorphingShape variant="spiral" color="primary" animation="pulse" interactive />
+          </FloatingElement>
+          <GlitchEffect intensity="subtle" speed="slow">
+            <MorphingShape variant="heart" color="accent" animation="float" interactive />
+          </GlitchEffect>
         </ScrollAnimation>
 
         {/* Feature Cards Grid */}
@@ -87,7 +96,7 @@ export function ThemeShowcase() {
             </AdvancedCard>
           </ScrollAnimation>
 
-          <ScrollAnimation animation="zoom-in" delay={200}>
+          <ScrollAnimation animation="zoom-in">
             <AdvancedCard 
               variant="crystalline" 
               hover 
@@ -110,8 +119,7 @@ export function ThemeShowcase() {
                   {['primary', 'secondary', 'accent', 'muted'].map((color, i) => (
                     <AnimationPresets 
                       key={color}
-                      preset="bounce-gentle" 
-                      delay={i * 100}
+                      preset="bounce-gentle"
                       className={`h-8 rounded-lg bg-${color} animate-pulse`}
                     />
                   ))}
@@ -120,7 +128,7 @@ export function ThemeShowcase() {
             </AdvancedCard>
           </ScrollAnimation>
 
-          <ScrollAnimation animation="slide-right" delay={400}>
+          <ScrollAnimation animation="slide-right">
             <AdvancedCard 
               variant="plasma" 
               hover 
@@ -198,14 +206,15 @@ export function ThemeShowcase() {
             <CardContent className="space-y-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {['gradient', 'glow', 'neon', 'holographic'].map((variant, i) => (
-                  <PremiumButton 
-                    key={variant}
-                    variant={variant as any}
-                    animation="float"
-                    className="w-full"
-                  >
-                    {variant}
-                  </PremiumButton>
+                  <FloatingElement key={variant} variant="bubble" speed="slow" distance="small">
+                    <PremiumButton 
+                      variant={variant as any}
+                      animation="float"
+                      className="w-full"
+                    >
+                      {variant}
+                    </PremiumButton>
+                  </FloatingElement>
                 ))}
               </div>
               
