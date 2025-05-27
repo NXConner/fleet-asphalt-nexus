@@ -1,9 +1,9 @@
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EstimatesHeader } from "./EstimatesHeader";
-import { EstimatesStats } from "./EstimatesStats";
-import { EstimatesList } from "./EstimatesList";
+import EstimatesHeader from "./EstimatesHeader";
+import EstimatesStats from "./EstimatesStats";
+import EstimatesList from "./EstimatesList";
 import { EstimateForm } from "./EstimateForm";
 import { Estimate } from "@/types/estimate";
 
@@ -74,7 +74,6 @@ export const EstimatesContainer = () => {
       <div className="container mx-auto px-4 py-8">
         <EstimateForm 
           onSave={handleSaveEstimate}
-          onCancel={() => setShowForm(false)}
         />
       </div>
     );
