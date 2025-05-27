@@ -1,6 +1,8 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Truck, Calculator, Users, DollarSign, Calendar, FileText } from "lucide-react";
+import DashboardChart from "@/components/DashboardChart";
+import NotificationSystem from "@/components/NotificationSystem";
 
 const Dashboard = () => {
   const stats = [
@@ -9,28 +11,32 @@ const Dashboard = () => {
       value: "24",
       description: "Fleet vehicles in operation",
       icon: Truck,
-      color: "text-blue-600"
+      color: "text-blue-600",
+      trend: { value: "8%", positive: true }
     },
     {
       title: "Pending Estimates",
       value: "12",
       description: "Awaiting client approval",
       icon: Calculator,
-      color: "text-orange-600"
+      color: "text-orange-600",
+      trend: { value: "3%", positive: false }
     },
     {
       title: "Active Jobs",
       value: "8",
       description: "Currently in progress",
       icon: Users,
-      color: "text-green-600"
+      color: "text-green-600",
+      trend: { value: "15%", positive: true }
     },
     {
       title: "Monthly Revenue",
       value: "$125,430",
       description: "This month's earnings",
       icon: DollarSign,
-      color: "text-purple-600"
+      color: "text-purple-600",
+      trend: { value: "12%", positive: true }
     }
   ];
 
@@ -68,9 +74,12 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Business Dashboard</h1>
-          <p className="text-gray-600 mt-2">Fleet Management & Asphalt Business Operations</p>
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Business Dashboard</h1>
+            <p className="text-gray-600 mt-2">Fleet Management & Asphalt Business Operations</p>
+          </div>
+          <NotificationSystem />
         </div>
 
         {/* Stats Grid */}
@@ -84,10 +93,21 @@ const Dashboard = () => {
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>
                 <p className="text-xs text-muted-foreground">{stat.description}</p>
+                {stat.trend && (
+                  <div className="flex items-center pt-1">
+                    <span className={`text-xs font-medium ${stat.trend.positive ? 'text-green-600' : 'text-red-600'}`}>
+                      {stat.trend.positive ? '+' : ''}{stat.trend.value}
+                    </span>
+                    <span className="text-xs text-muted-foreground ml-1">from last month</span>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
         </div>
+
+        {/* Charts */}
+        <DashboardChart />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Quick Actions */}

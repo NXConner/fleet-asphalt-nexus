@@ -1,9 +1,16 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Truck, Wrench, MapPin, Plus, AlertTriangle } from "lucide-react";
+import { Truck, Wrench, MapPin, AlertTriangle } from "lucide-react";
+import AddVehicleForm from "@/components/AddVehicleForm";
+import SearchFilter from "@/components/SearchFilter";
+import VehicleDetails from "@/components/VehicleDetails";
 
 const FleetManagement = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
   const vehicles = [
     {
       id: "FL-001",
@@ -37,6 +44,20 @@ const FleetManagement = () => {
     }
   ];
 
+  const filterOptions = [
+    { value: "Active", label: "Active" },
+    { value: "In Use", label: "In Use" },
+    { value: "Maintenance", label: "Maintenance" }
+  ];
+
+  const filteredVehicles = vehicles.filter(vehicle => {
+    const matchesSearch = vehicle.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         vehicle.driver.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         vehicle.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = statusFilter === "all" || vehicle.status === statusFilter;
+    return matchesSearch && matchesFilter;
+  });
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Active":
@@ -58,10 +79,7 @@ const FleetManagement = () => {
             <h1 className="text-3xl font-bold text-gray-900">Fleet Management</h1>
             <p className="text-gray-600 mt-2">Manage your vehicles, maintenance, and drivers</p>
           </div>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Vehicle
-          </Button>
+          <AddVehicleForm />
         </div>
 
         {/* Fleet Overview Cards */}
@@ -100,15 +118,25 @@ const FleetManagement = () => {
           </Card>
         </div>
 
+        {/* Search and Filter */}
+        <SearchFilter
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          filterValue={statusFilter}
+          onFilterChange={setStatusFilter}
+          filterOptions={filterOptions}
+          placeholder="Search vehicles by name, driver, or ID..."
+        />
+
         {/* Vehicle List */}
         <Card>
           <CardHeader>
-            <CardTitle>Vehicle Fleet</CardTitle>
+            <CardTitle>Vehicle Fleet ({filteredVehicles.length})</CardTitle>
             <CardDescription>Overview of all vehicles in your fleet</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {vehicles.map((vehicle) => (
+              {filteredVehicles.map((vehicle) => (
                 <div key={vehicle.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
                   <div className="flex items-center gap-4">
                     <div className="p-2 bg-blue-100 rounded-lg">
@@ -143,10 +171,12 @@ const FleetManagement = () => {
                       <p className="text-sm text-gray-500">{vehicle.driver}</p>
                     </div>
                     
-                    <Button variant="outline" size="sm">
-                      <Wrench className="h-4 w-4 mr-2" />
-                      Manage
-                    </Button>
+                    <VehicleDetails vehicle={vehicle}>
+                      <Button variant="outline" size="sm">
+                        <Wrench className="h-4 w-4 mr-2" />
+                        Details
+                      </Button>
+                    </VehicleDetails>
                   </div>
                 </div>
               ))}

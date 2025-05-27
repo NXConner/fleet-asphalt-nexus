@@ -1,67 +1,85 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calculator, FileText, Plus, Clock, CheckCircle, XCircle } from "lucide-react";
+import { Calculator, Clock, DollarSign, FileText } from "lucide-react";
+import AddEstimateForm from "@/components/AddEstimateForm";
+import SearchFilter from "@/components/SearchFilter";
 
 const Estimates = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
   const estimates = [
     {
-      id: "EST-2024-001",
-      client: "ABC Construction",
-      project: "Main Street Resurfacing",
-      area: "2,500 sq ft",
-      amount: "$15,750",
+      id: "EST-001",
+      clientName: "ABC Construction",
+      projectType: "Parking Lot",
+      location: "123 Business Park",
+      amount: 25000,
       status: "Pending",
-      createdDate: "2024-05-20",
-      expiryDate: "2024-06-20"
+      date: "2024-01-15",
+      expiryDate: "2024-02-15",
+      description: "New parking lot construction with drainage"
     },
     {
-      id: "EST-2024-002",
-      client: "City Municipal",
-      project: "Downtown Parking Lot",
-      area: "8,000 sq ft",
-      amount: "$48,000",
+      id: "EST-002",
+      clientName: "City Municipality",
+      projectType: "Road Repair",
+      location: "Main Street",
+      amount: 45000,
       status: "Approved",
-      createdDate: "2024-05-18",
-      expiryDate: "2024-06-18"
+      date: "2024-01-20",
+      expiryDate: "2024-02-20",
+      description: "Pothole repairs and resurfacing"
     },
     {
-      id: "EST-2024-003",
-      client: "Green Valley HOA",
-      project: "Community Road Repair",
-      area: "1,200 sq ft",
-      amount: "$9,600",
-      status: "Rejected",
-      createdDate: "2024-05-15",
-      expiryDate: "2024-06-15"
+      id: "EST-003",
+      clientName: "Residential Client",
+      projectType: "Driveway",
+      location: "456 Oak Avenue",
+      amount: 8500,
+      status: "Draft",
+      date: "2024-01-25",
+      expiryDate: "2024-02-25",
+      description: "Residential driveway paving"
     }
   ];
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "Pending":
-        return <Clock className="h-4 w-4 text-orange-600" />;
-      case "Approved":
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case "Rejected":
-        return <XCircle className="h-4 w-4 text-red-600" />;
-      default:
-        return <Clock className="h-4 w-4 text-gray-600" />;
-    }
-  };
+  const filterOptions = [
+    { value: "Pending", label: "Pending" },
+    { value: "Approved", label: "Approved" },
+    { value: "Draft", label: "Draft" },
+    { value: "Rejected", label: "Rejected" }
+  ];
+
+  const filteredEstimates = estimates.filter(estimate => {
+    const matchesSearch = estimate.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         estimate.projectType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         estimate.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = statusFilter === "all" || estimate.status === statusFilter;
+    return matchesSearch && matchesFilter;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Pending":
-        return "text-orange-600 bg-orange-100";
       case "Approved":
-        return "text-green-600 bg-green-100";
+        return "bg-green-100 text-green-800";
+      case "Pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "Draft":
+        return "bg-gray-100 text-gray-800";
       case "Rejected":
-        return "text-red-600 bg-red-100";
+        return "bg-red-100 text-red-800";
       default:
-        return "text-gray-600 bg-gray-100";
+        return "bg-gray-100 text-gray-800";
     }
   };
+
+  const totalValue = estimates.reduce((sum, est) => sum + est.amount, 0);
+  const pendingCount = estimates.filter(est => est.status === "Pending").length;
+  const approvedCount = estimates.filter(est => est.status === "Approved").length;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -69,15 +87,12 @@ const Estimates = () => {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Estimates</h1>
-            <p className="text-gray-600 mt-2">Create and manage project estimates</p>
+            <p className="text-gray-600 mt-2">Manage project quotes and proposals</p>
           </div>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            New Estimate
-          </Button>
+          <AddEstimateForm />
         </div>
 
-        {/* Estimates Overview */}
+        {/* Estimates Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -85,94 +100,108 @@ const Estimates = () => {
               <FileText className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">47</div>
-              <p className="text-xs text-muted-foreground">This year</p>
+              <div className="text-2xl font-bold">{estimates.length}</div>
+              <p className="text-xs text-muted-foreground">Active proposals</p>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending</CardTitle>
-              <Clock className="h-4 w-4 text-orange-600" />
+              <CardTitle className="text-sm font-medium">Pending Approval</CardTitle>
+              <Clock className="h-4 w-4 text-yellow-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">12</div>
-              <p className="text-xs text-muted-foreground">Awaiting response</p>
+              <div className="text-2xl font-bold">{pendingCount}</div>
+              <p className="text-xs text-muted-foreground">Awaiting client response</p>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Approved</CardTitle>
-              <CheckCircle className="h-4 w-4 text-green-600" />
+              <Calculator className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">28</div>
-              <p className="text-xs text-muted-foreground">59% approval rate</p>
+              <div className="text-2xl font-bold">{approvedCount}</div>
+              <p className="text-xs text-muted-foreground">Ready to convert</p>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Value</CardTitle>
-              <Calculator className="h-4 w-4 text-purple-600" />
+              <DollarSign className="h-4 w-4 text-purple-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$485K</div>
-              <p className="text-xs text-muted-foreground">Pending estimates</p>
+              <div className="text-2xl font-bold">${totalValue.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">Potential revenue</p>
             </CardContent>
           </Card>
         </div>
 
+        {/* Search and Filter */}
+        <SearchFilter
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          filterValue={statusFilter}
+          onFilterChange={setStatusFilter}
+          filterOptions={filterOptions}
+          placeholder="Search estimates by client, project type, or ID..."
+        />
+
         {/* Estimates List */}
         <Card>
           <CardHeader>
-            <CardTitle>Recent Estimates</CardTitle>
-            <CardDescription>Overview of all project estimates</CardDescription>
+            <CardTitle>All Estimates ({filteredEstimates.length})</CardTitle>
+            <CardDescription>Track and manage your project estimates</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {estimates.map((estimate) => (
-                <div key={estimate.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                  <div className="flex items-center gap-4">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <Calculator className="h-6 w-6 text-blue-600" />
-                    </div>
+              {filteredEstimates.map((estimate) => (
+                <div key={estimate.id} className="p-6 border rounded-lg hover:shadow-md transition-shadow">
+                  <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 className="font-semibold">{estimate.project}</h3>
-                      <p className="text-sm text-gray-500">{estimate.id} • {estimate.client}</p>
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-semibold">{estimate.clientName}</h3>
+                        <Badge className={getStatusColor(estimate.status)}>
+                          {estimate.status}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-600">{estimate.id} • {estimate.projectType}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-green-600">
+                        ${estimate.amount.toLocaleString()}
+                      </div>
+                      <p className="text-sm text-gray-500">Estimated value</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-8">
-                    <div className="text-center">
-                      <p className="text-sm font-medium">Area</p>
-                      <p className="text-sm text-gray-500">{estimate.area}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Location</p>
+                      <p className="text-sm text-gray-600">{estimate.location}</p>
                     </div>
-                    
-                    <div className="text-center">
-                      <p className="text-sm font-medium">Amount</p>
-                      <p className="text-sm font-semibold text-green-600">{estimate.amount}</p>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Created</p>
+                      <p className="text-sm text-gray-600">{estimate.date}</p>
                     </div>
-                    
-                    <div className="text-center">
-                      <p className="text-sm font-medium">Status</p>
-                      <div className="flex items-center gap-1">
-                        {getStatusIcon(estimate.status)}
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(estimate.status)}`}>
-                          {estimate.status}
-                        </span>
-                      </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Expires</p>
+                      <p className="text-sm text-gray-600">{estimate.expiryDate}</p>
                     </div>
-                    
-                    <div className="text-center">
-                      <p className="text-sm font-medium">Expires</p>
-                      <p className="text-sm text-gray-500">{estimate.expiryDate}</p>
-                    </div>
-                    
-                    <Button variant="outline" size="sm">
-                      View Details
-                    </Button>
+                  </div>
+                  
+                  <p className="text-sm text-gray-600 mb-4">{estimate.description}</p>
+                  
+                  <div className="flex gap-2">
+                    <Button size="sm">View Details</Button>
+                    <Button variant="outline" size="sm">Edit</Button>
+                    {estimate.status === "Approved" && (
+                      <Button variant="outline" size="sm" className="text-green-600 border-green-200">
+                        Convert to Job
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
