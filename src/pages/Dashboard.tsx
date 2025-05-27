@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardOverview } from "@/components/dashboard/DashboardOverview";
 import { DashboardFleet } from "@/components/dashboard/DashboardFleet";
 import { DashboardOptimization } from "@/components/dashboard/DashboardOptimization";
-import { mockStats } from "@/data/mockData";
+import { mockStats } from "@/data/mockStats";
 
 const Dashboard = () => {
   return (
