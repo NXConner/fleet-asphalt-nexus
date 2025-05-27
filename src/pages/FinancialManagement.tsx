@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search, DollarSign, TrendingUp, CreditCard, FileText, Calendar } from "lucide-react";
-import { Invoice, Payment } from "@/types/invoice";
+import { Invoice, PaymentRecord } from "@/types/invoice";
 
 const FinancialManagement = () => {
   const [invoices] = useState<Invoice[]>([
@@ -14,6 +14,14 @@ const FinancialManagement = () => {
       id: "inv-001",
       invoiceNumber: "INV-2024-001",
       customerId: "cust-001",
+      customerName: "ABC Construction Co.",
+      customerEmail: "contact@abcconstruction.com",
+      customerAddress: {
+        street: "123 Business Park Dr",
+        city: "Richmond",
+        state: "VA",
+        zipCode: "23230"
+      },
       estimateId: "est-001",
       status: "sent",
       items: [
@@ -23,7 +31,8 @@ const FinancialManagement = () => {
           quantity: 2500,
           unit: "sq ft",
           unitPrice: 12,
-          total: 30000
+          total: 30000,
+          taxable: true
         },
         {
           id: "item-002",
@@ -31,14 +40,14 @@ const FinancialManagement = () => {
           quantity: 500,
           unit: "linear ft",
           unitPrice: 3,
-          total: 1500
+          total: 1500,
+          taxable: true
         }
       ],
       subtotal: 31500,
       taxRate: 7.5,
       taxAmount: 2362.50,
       total: 33862.50,
-      amountPaid: 0,
       balanceRemaining: 33862.50,
       issueDate: "2024-01-27T00:00:00Z",
       dueDate: "2024-02-26T00:00:00Z",
@@ -50,6 +59,14 @@ const FinancialManagement = () => {
       id: "inv-002",
       invoiceNumber: "INV-2024-002",
       customerId: "cust-002",
+      customerName: "Sarah Johnson",
+      customerEmail: "sarah.johnson@email.com",
+      customerAddress: {
+        street: "456 Oak Avenue",
+        city: "Norfolk",
+        state: "VA",
+        zipCode: "23510"
+      },
       jobId: "job-001",
       status: "paid",
       items: [
@@ -59,35 +76,34 @@ const FinancialManagement = () => {
           quantity: 1800,
           unit: "sq ft",
           unitPrice: 8,
-          total: 14400
+          total: 14400,
+          taxable: true
         }
       ],
       subtotal: 14400,
       taxRate: 7.5,
       taxAmount: 1080,
       total: 15480,
-      amountPaid: 15480,
       balanceRemaining: 0,
       issueDate: "2024-01-20T00:00:00Z",
       dueDate: "2024-02-19T00:00:00Z",
       paidDate: "2024-01-25T00:00:00Z",
-      paymentMethod: "bank-transfer",
+      paymentMethod: "bank_transfer",
       terms: "Net 30 days",
       createdAt: "2024-01-20T00:00:00Z",
       updatedAt: "2024-01-25T00:00:00Z"
     }
   ]);
 
-  const [payments] = useState<Payment[]>([
+  const [payments] = useState<PaymentRecord[]>([
     {
       id: "pay-001",
       invoiceId: "inv-002",
       amount: 15480,
-      method: "bank-transfer",
+      paymentMethod: "bank_transfer",
       reference: "TXN-20240125-001",
-      date: "2024-01-25T00:00:00Z",
-      notes: "Payment received in full",
-      createdAt: "2024-01-25T00:00:00Z"
+      paymentDate: "2024-01-25T00:00:00Z",
+      notes: "Payment received in full"
     }
   ]);
 
@@ -121,10 +137,10 @@ const FinancialManagement = () => {
   const stats = {
     totalInvoices: invoices.length,
     totalRevenue: invoices.reduce((sum, inv) => sum + inv.total, 0),
-    outstandingAmount: invoices.reduce((sum, inv) => sum + inv.balanceRemaining, 0),
+    outstandingAmount: invoices.reduce((sum, inv) => sum + (inv.balanceRemaining || 0), 0),
     overdueAmount: invoices
       .filter(inv => isOverdue(inv))
-      .reduce((sum, inv) => sum + inv.balanceRemaining, 0)
+      .reduce((sum, inv) => sum + (inv.balanceRemaining || 0), 0)
   };
 
   return (
@@ -231,7 +247,7 @@ const FinancialManagement = () => {
                       </div>
                       
                       <div className="text-sm text-muted-foreground space-y-1">
-                        <div>Customer: {invoice.customerId}</div>
+                        <div>Customer: {invoice.customerName}</div>
                         <div>Issue Date: {new Date(invoice.issueDate).toLocaleDateString()}</div>
                         <div>Due Date: {new Date(invoice.dueDate).toLocaleDateString()}</div>
                         {invoice.paidDate && (
@@ -256,7 +272,7 @@ const FinancialManagement = () => {
                       <div className="text-2xl font-bold text-green-600">
                         ${invoice.total.toLocaleString()}
                       </div>
-                      {invoice.balanceRemaining > 0 && (
+                      {invoice.balanceRemaining && invoice.balanceRemaining > 0 && (
                         <div className="text-sm text-red-600">
                           Outstanding: ${invoice.balanceRemaining.toLocaleString()}
                         </div>
@@ -271,7 +287,7 @@ const FinancialManagement = () => {
                         <Button size="sm" variant="outline">
                           Send
                         </Button>
-                        {invoice.balanceRemaining > 0 && (
+                        {invoice.balanceRemaining && invoice.balanceRemaining > 0 && (
                           <Button size="sm">
                             Record Payment
                           </Button>
@@ -296,12 +312,12 @@ const FinancialManagement = () => {
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-lg">Payment for {invoice?.invoiceNumber}</h3>
-                          <Badge variant="outline">{payment.method.replace('-', ' ')}</Badge>
+                          <Badge variant="outline">{payment.paymentMethod.replace('_', ' ')}</Badge>
                         </div>
                         
                         <div className="text-sm text-muted-foreground space-y-1">
                           <div>Amount: ${payment.amount.toLocaleString()}</div>
-                          <div>Date: {new Date(payment.date).toLocaleDateString()}</div>
+                          <div>Date: {new Date(payment.paymentDate).toLocaleDateString()}</div>
                           {payment.reference && <div>Reference: {payment.reference}</div>}
                           {payment.notes && <div>Notes: {payment.notes}</div>}
                         </div>
