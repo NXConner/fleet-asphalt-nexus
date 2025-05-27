@@ -28,6 +28,10 @@ const DashboardChart = () => {
     bar: isDark ? "#60A5FA" : "#3B82F6"
   };
 
+  const renderCustomLabel = ({ name, value }: { name: string; value: number }) => {
+    return `${name}: ${value}`;
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <Card>
@@ -73,8 +77,7 @@ const DashboardChart = () => {
                 cy="50%"
                 outerRadius={80}
                 dataKey="value"
-                label={({ name, value }) => `${name}: ${value}`}
-                labelStyle={{ fill: chartColors.text }}
+                label={renderCustomLabel}
               >
                 {fleetUtilization.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />

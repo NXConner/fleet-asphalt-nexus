@@ -5,6 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./components/ThemeProvider";
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Navigation from "./components/Navigation";
 import Dashboard from "./pages/Dashboard";
 import FleetManagement from "./pages/FleetManagement";
@@ -18,25 +20,29 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <div className="min-h-screen bg-background text-foreground">
-            <Navigation />
-            <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/fleet" element={<FleetManagement />} />
-              <Route path="/estimates" element={<Estimates />} />
-              <Route path="/jobs" element={<Jobs />} />
-              <Route path="/invoices" element={<Invoices />} />
-              <Route path="/settings" element={<div className="p-6"><h1 className="text-2xl font-bold">Settings - Coming Soon</h1></div>} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
-        </BrowserRouter>
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <ProtectedRoute>
+              <div className="min-h-screen bg-background text-foreground">
+                <Navigation />
+                <Routes>
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/fleet" element={<FleetManagement />} />
+                  <Route path="/estimates" element={<Estimates />} />
+                  <Route path="/jobs" element={<Jobs />} />
+                  <Route path="/invoices" element={<Invoices />} />
+                  <Route path="/settings" element={<div className="p-6"><h1 className="text-2xl font-bold">Settings - Coming Soon</h1></div>} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
+            </ProtectedRoute>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );

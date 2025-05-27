@@ -4,6 +4,8 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, BarChart3, Truck, FileText, Briefcase, Receipt, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
+import NotificationSystem from "./NotificationSystem";
+import UserMenu from "./UserMenu";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -52,14 +54,18 @@ const Navigation = () => {
                 </Link>
               );
             })}
-            <div className="ml-4">
+            <div className="ml-4 flex items-center space-x-2">
+              <NotificationSystem />
               <ThemeToggle />
+              <UserMenu />
             </div>
           </div>
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-2">
+            <NotificationSystem />
             <ThemeToggle />
+            <UserMenu />
             <Button
               variant="ghost"
               size="icon"
