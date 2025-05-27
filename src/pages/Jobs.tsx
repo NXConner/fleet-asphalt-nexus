@@ -1,204 +1,282 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Users, MapPin, Calendar, Plus, Clock, CheckCircle, AlertTriangle } from "lucide-react";
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Search, Filter } from 'lucide-react';
+import { Job } from '@/types/job';
+import JobCard from '@/components/JobCard';
+import JobDetails from '@/components/JobDetails';
+import CreateJobForm from '@/components/CreateJobForm';
 
 const Jobs = () => {
-  const jobs = [
+  const [jobs, setJobs] = useState<Job[]>([
     {
-      id: "JOB-2024-001",
-      name: "Main Street Resurfacing",
-      client: "City Municipal",
-      status: "In Progress",
-      location: "Main Street, Downtown",
-      startDate: "2024-05-20",
-      estimatedCompletion: "2024-06-05",
-      assignedVehicles: ["FL-001", "FL-002"],
-      progress: 65
+      id: 'JOB-001',
+      title: 'Main Street Paving Project',
+      client: {
+        name: 'City of Springfield',
+        email: 'public.works@springfield.gov',
+        phone: '(555) 123-4567',
+        address: '123 City Hall Plaza, Springfield'
+      },
+      project: {
+        type: 'paving',
+        description: 'Complete repaving of Main Street from 1st Avenue to 5th Avenue',
+        location: 'Main Street, Downtown Springfield',
+        estimatedArea: 12000,
+        estimatedCost: 85000
+      },
+      status: 'in-progress',
+      priority: 'high',
+      schedule: {
+        startDate: '2024-01-15T08:00:00Z',
+        endDate: '2024-01-25T17:00:00Z',
+        estimatedDuration: 10
+      },
+      assignedVehicles: ['VH-001', 'VH-003'],
+      assignedCrew: ['John Doe', 'Jane Smith', 'Mike Wilson'],
+      progress: 65,
+      timeline: [
+        {
+          id: 'tl-001',
+          type: 'progress',
+          title: 'Progress Update',
+          description: 'Completed section 3 of 5. Moving ahead of schedule.',
+          timestamp: '2024-01-20T14:30:00Z',
+          user: 'John Doe'
+        },
+        {
+          id: 'tl-002',
+          type: 'started',
+          title: 'Project Started',
+          description: 'Crew arrived on site and began prep work.',
+          timestamp: '2024-01-15T08:00:00Z',
+          user: 'Mike Wilson'
+        }
+      ],
+      createdAt: '2024-01-10T10:00:00Z',
+      updatedAt: '2024-01-20T14:30:00Z'
     },
     {
-      id: "JOB-2024-002",
-      name: "Shopping Center Parking Lot",
-      client: "Retail Plaza Inc",
-      status: "Scheduled",
-      location: "West Side Shopping Center",
-      startDate: "2024-06-10",
-      estimatedCompletion: "2024-06-20",
-      assignedVehicles: ["FL-003"],
-      progress: 0
-    },
-    {
-      id: "JOB-2024-003",
-      name: "Residential Driveway Repairs",
-      client: "Green Valley HOA",
-      status: "Completed",
-      location: "Green Valley Subdivision",
-      startDate: "2024-05-01",
-      estimatedCompletion: "2024-05-15",
-      assignedVehicles: ["FL-004"],
-      progress: 100
+      id: 'JOB-002',
+      title: 'Shopping Center Sealcoating',
+      client: {
+        name: 'Westfield Shopping Center',
+        email: 'maintenance@westfieldsc.com',
+        phone: '(555) 987-6543',
+        address: '456 Commerce Drive, Springfield'
+      },
+      project: {
+        type: 'sealcoating',
+        description: 'Sealcoating of entire parking lot and touch-up striping',
+        location: 'Westfield Shopping Center Parking Lot',
+        estimatedArea: 25000,
+        estimatedCost: 15000
+      },
+      status: 'scheduled',
+      priority: 'medium',
+      schedule: {
+        startDate: '2024-02-01T07:00:00Z',
+        endDate: '2024-02-03T16:00:00Z',
+        estimatedDuration: 3
+      },
+      assignedVehicles: ['VH-002'],
+      assignedCrew: ['Sarah Johnson'],
+      progress: 0,
+      timeline: [
+        {
+          id: 'tl-003',
+          type: 'scheduled',
+          title: 'Job Scheduled',
+          description: 'Job scheduled for February 1st. Weather conditions looking favorable.',
+          timestamp: '2024-01-25T12:00:00Z',
+          user: 'Sarah Johnson'
+        }
+      ],
+      createdAt: '2024-01-20T15:00:00Z',
+      updatedAt: '2024-01-25T12:00:00Z'
     }
-  ];
+  ]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "In Progress":
-        return "bg-blue-100 text-blue-800";
-      case "Scheduled":
-        return "bg-orange-100 text-orange-800";
-      case "Completed":
-        return "bg-green-100 text-green-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
+  const [view, setView] = useState<'list' | 'create' | 'details'>('list');
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [priorityFilter, setPriorityFilter] = useState<string>('all');
+
+  const filteredJobs = jobs.filter(job => {
+    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         job.client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         job.project.location.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === 'all' || job.status === statusFilter;
+    const matchesPriority = priorityFilter === 'all' || job.priority === priorityFilter;
+    
+    return matchesSearch && matchesStatus && matchesPriority;
+  });
+
+  const handleJobCreated = (newJob: Job) => {
+    setJobs(prev => [newJob, ...prev]);
+    setView('list');
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "In Progress":
-        return <Clock className="h-4 w-4" />;
-      case "Scheduled":
-        return <AlertTriangle className="h-4 w-4" />;
-      case "Completed":
-        return <CheckCircle className="h-4 w-4" />;
-      default:
-        return <Clock className="h-4 w-4" />;
-    }
+  const handleJobUpdate = (updatedJob: Job) => {
+    setJobs(prev => prev.map(job => job.id === updatedJob.id ? updatedJob : job));
+    setSelectedJob(updatedJob);
+  };
+
+  const handleViewDetails = (job: Job) => {
+    setSelectedJob(job);
+    setView('details');
+  };
+
+  const handleEditJob = (job: Job) => {
+    // For now, just show details. Edit functionality can be added later
+    handleViewDetails(job);
+  };
+
+  if (view === 'create') {
+    return (
+      <div className="min-h-screen bg-background p-6">
+        <div className="max-w-7xl mx-auto">
+          <CreateJobForm
+            onJobCreated={handleJobCreated}
+            onCancel={() => setView('list')}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (view === 'details' && selectedJob) {
+    return (
+      <div className="min-h-screen bg-background p-6">
+        <div className="max-w-7xl mx-auto">
+          <JobDetails
+            job={selectedJob}
+            onUpdate={handleJobUpdate}
+            onClose={() => setView('list')}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Stats
+  const stats = {
+    total: jobs.length,
+    pending: jobs.filter(j => j.status === 'pending').length,
+    inProgress: jobs.filter(j => j.status === 'in-progress').length,
+    completed: jobs.filter(j => j.status === 'completed').length
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Jobs</h1>
-            <p className="text-gray-600 mt-2">Manage active and scheduled projects</p>
+            <h1 className="text-3xl font-bold">Job Management</h1>
+            <p className="text-muted-foreground mt-2">Track and manage your asphalt projects</p>
           </div>
-          <Button>
+          <Button onClick={() => setView('create')}>
             <Plus className="h-4 w-4 mr-2" />
             Create Job
           </Button>
         </div>
 
-        {/* Jobs Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Jobs</CardTitle>
-              <Users className="h-4 w-4 text-blue-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">28</div>
-              <p className="text-xs text-muted-foreground">This year</p>
+            <CardContent className="p-4">
+              <div className="text-2xl font-bold">{stats.total}</div>
+              <p className="text-sm text-muted-foreground">Total Jobs</p>
             </CardContent>
           </Card>
-          
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-              <Clock className="h-4 w-4 text-blue-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">8</div>
-              <p className="text-xs text-muted-foreground">Active projects</p>
+            <CardContent className="p-4">
+              <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+              <p className="text-sm text-muted-foreground">Pending</p>
             </CardContent>
           </Card>
-          
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Scheduled</CardTitle>
-              <Calendar className="h-4 w-4 text-orange-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">5</div>
-              <p className="text-xs text-muted-foreground">Upcoming</p>
+            <CardContent className="p-4">
+              <div className="text-2xl font-bold text-green-600">{stats.inProgress}</div>
+              <p className="text-sm text-muted-foreground">In Progress</p>
             </CardContent>
           </Card>
-          
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed</CardTitle>
-              <CheckCircle className="h-4 w-4 text-green-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">15</div>
-              <p className="text-xs text-muted-foreground">This year</p>
+            <CardContent className="p-4">
+              <div className="text-2xl font-bold text-gray-600">{stats.completed}</div>
+              <p className="text-sm text-muted-foreground">Completed</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Jobs List */}
+        {/* Filters */}
         <Card>
-          <CardHeader>
-            <CardTitle>Active Jobs</CardTitle>
-            <CardDescription>Current and upcoming project assignments</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {jobs.map((job) => (
-                <div key={job.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <h3 className="font-semibold text-lg">{job.name}</h3>
-                      <p className="text-sm text-gray-500">{job.id} • {job.client}</p>
-                    </div>
-                    <Badge className={getStatusColor(job.status)}>
-                      <div className="flex items-center gap-1">
-                        {getStatusIcon(job.status)}
-                        {job.status}
-                      </div>
-                    </Badge>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">{job.location}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">{job.startDate} - {job.estimatedCompletion}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">Vehicles: {job.assignedVehicles.join(", ")}</span>
-                    </div>
-                  </div>
-                  
-                  {job.status === "In Progress" && (
-                    <div className="mb-4">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-sm font-medium">Progress</span>
-                        <span className="text-sm text-gray-500">{job.progress}%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-blue-600 h-2 rounded-full" 
-                          style={{ width: `${job.progress}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      View Details
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      Edit Job
-                    </Button>
-                    {job.status === "In Progress" && (
-                      <Button variant="outline" size="sm">
-                        Update Progress
-                      </Button>
-                    )}
-                  </div>
+          <CardContent className="p-4">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search jobs, clients, or locations..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
                 </div>
-              ))}
+              </div>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full md:w-48">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="scheduled">Scheduled</SelectItem>
+                  <SelectItem value="in-progress">In Progress</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                <SelectTrigger className="w-full md:w-48">
+                  <SelectValue placeholder="Filter by priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Priorities</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="urgent">Urgent</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>
+
+        {/* Jobs Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredJobs.map(job => (
+            <JobCard
+              key={job.id}
+              job={job}
+              onViewDetails={handleViewDetails}
+              onEdit={handleEditJob}
+            />
+          ))}
+        </div>
+
+        {filteredJobs.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No jobs found matching your criteria.</p>
+          </div>
+        )}
       </div>
     </div>
   );
