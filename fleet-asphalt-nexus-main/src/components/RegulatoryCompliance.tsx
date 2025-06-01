@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -261,6 +260,7 @@ export const RegulatoryCompliance = () => {
                     value={selectedAuthority}
                     onChange={(e) => setSelectedAuthority(e.target.value)}
                     className="px-3 py-2 border rounded-md"
+                    title="Authority filter select"
                   >
                     <option value="">All Authorities</option>
                     <option value="Federal">Federal</option>

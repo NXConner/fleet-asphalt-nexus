@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,8 @@ import { AsphaltDetection } from "@/components/mapping/AsphaltDetection";
 import { Rnd } from 'react-rnd';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { HeatmapLayer } from 'react-leaflet-heatmap-layer-v3';
+import ARProjection from '../components/ui/ARProjection';
 
 const mapProviders = [
   { id: 'mapbox', name: 'Mapbox Satellite', style: 'mapbox://styles/mapbox/satellite-streets-v11' },
@@ -47,6 +49,24 @@ const AdvancedMapping = () => {
   const [isPopout, setIsPopout] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
   const [asphaltHighlight, setAsphaltHighlight] = useState(true);
+  const [complianceZones, setComplianceZones] = useState<any[]>([]);
+  const [dirtyZones, setDirtyZones] = useState<any[]>([]);
+  const [cleanZones, setCleanZones] = useState<any[]>([]);
+  const [geofencingEnabled, setGeofencingEnabled] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState<any>(null);
+  const [inGeofence, setInGeofence] = useState(false);
+  const [pciData, setPciData] = useState<any[]>([]);
+  const [pciLoading, setPciLoading] = useState(false);
+  const [pciError, setPciError] = useState<string|null>(null);
+  const [editingZone, setEditingZone] = useState<any|null>(null);
+  const [arMode, setArMode] = useState(false);
+
+  const geofenceRegion = useMemo(() => ({
+    id: 'demo-geofence',
+    name: 'HQ Lot',
+    center: { lat: 37.5, lng: -77.4 },
+    radius: 0.001 // ~100m
+  }), []);
 
   const handleGeocodeSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -110,6 +130,97 @@ const AdvancedMapping = () => {
     a.download = 'asphalt-detection.geojson';
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleDrawZone = (zone: any) => {
+    if (zone.type === 'dirty') {
+      setDirtyZones(prev => [...prev, { ...zone, id: Date.now() }]);
+    } else if (zone.type === 'clean') {
+      setCleanZones(prev => [...prev, { ...zone, id: Date.now() }]);
+    }
+  };
+
+  const handleBeforeAfterPhotoUpload = (type: 'before' | 'after', file: File) => {
+    // TODO: Upload logic
+    console.log(`Photo uploaded (${type}):`, file);
+  };
+
+  const handleDropLineTemplate = (template: string) => {
+    // TODO: Add dropped template to selectedArea or map
+    console.log('Dropped line template:', template, selectedArea);
+  };
+
+  useEffect(() => {
+    if (geofencingEnabled) {
+      const geoId = navigator.geolocation.watchPosition(
+        pos => setCurrentLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        err => console.warn('Geolocation error', err),
+        { enableHighAccuracy: true }
+      );
+      return () => navigator.geolocation.clearWatch(geoId);
+    }
+  }, [geofencingEnabled]);
+
+  useEffect(() => {
+    if (geofencingEnabled && currentLocation) {
+      const dist = Math.sqrt(
+        Math.pow(currentLocation.lat - geofenceRegion.center.lat, 2) +
+        Math.pow(currentLocation.lng - geofenceRegion.center.lng, 2)
+      );
+      const inside = dist < geofenceRegion.radius;
+      setInGeofence(inside);
+      // Optionally: show notification or badge
+      if (inside) {
+        // TODO: Show entry notification
+        console.log('Entered geofence:', geofenceRegion.name);
+      } else {
+        // TODO: Show exit notification
+        console.log('Exited geofence:', geofenceRegion.name);
+      }
+    }
+  }, [geofencingEnabled, currentLocation, geofenceRegion]);
+
+  useEffect(() => {
+    setPciLoading(true);
+    setPciError(null);
+    // TODO: Replace with real API endpoint
+    fetch('/api/assessments/pci')
+      .then(res => res.json())
+      .then(data => {
+        setPciData(data);
+        setPciLoading(false);
+      })
+      .catch(err => {
+        setPciError('Failed to load PCI data');
+        setPciLoading(false);
+      });
+  }, []);
+
+  // Load/save compliance zones from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('complianceZones');
+    if (saved) setComplianceZones(JSON.parse(saved));
+  }, []);
+  useEffect(() => {
+    localStorage.setItem('complianceZones', JSON.stringify(complianceZones));
+  }, [complianceZones]);
+
+  const addComplianceZone = useCallback(() => {
+    const newZone = {
+      id: Date.now().toString(),
+      x: 100, y: 100, width: 120, height: 80,
+      compliant: true,
+      tooltip: 'New compliance zone'
+    };
+    setComplianceZones(zones => [...zones, newZone]);
+    setEditingZone(newZone);
+  }, []);
+  const updateComplianceZone = (id: string, updates: any) => {
+    setComplianceZones(zones => zones.map(z => z.id === id ? { ...z, ...updates } : z));
+  };
+  const deleteComplianceZone = (id: string) => {
+    setComplianceZones(zones => zones.filter(z => z.id !== id));
+    setEditingZone(null);
   };
 
   return (
@@ -354,8 +465,8 @@ const AdvancedMapping = () => {
             </CardHeader>
             <CardContent>
               <Label htmlFor="provider-select">Map Provider</Label>
-              <Select id="provider-select" title="Select map provider" value={provider} onValueChange={setProvider}>
-                <SelectTrigger title="Map provider">
+              <Select id="provider-select" title="Select map provider" aria-label="Select map provider" value={provider} onValueChange={setProvider}>
+                <SelectTrigger title="Map provider" aria-label="Map provider">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -373,10 +484,113 @@ const AdvancedMapping = () => {
               <Button onClick={()=>setIsPopout(v=>!v)}>{isPopout?'Dock':'Popout'}</Button>
               <Button onClick={()=>setIsPinned(v=>!v)}>{isPinned?'Unpin':'Pin'}</Button>
               <Switch checked={asphaltHighlight} onCheckedChange={setAsphaltHighlight} /> Asphalt Highlight
+              <div className="mt-2 flex items-center gap-2">
+                <Switch checked={geofencingEnabled} onCheckedChange={setGeofencingEnabled} /> Geofencing
+                {geofencingEnabled && (
+                  <span className={`ml-2 px-2 py-1 rounded text-xs ${inGeofence ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
+                    {inGeofence ? 'Inside Geofence' : 'Outside Geofence'}
+                  </span>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* PCI Heatmap Overlay (choropleth) */}
+      {mapMode === 'detect' && pciData.length > 0 && !pciLoading && (
+        <HeatmapLayer
+          fitBoundsOnLoad
+          fitBoundsOnUpdate
+          points={pciData.map(p => ({lat: p.lat, lng: p.lng, value: p.pci}))}
+          longitudeExtractor={m => m.lng}
+          latitudeExtractor={m => m.lat}
+          intensityExtractor={m => m.value}
+          max={100}
+          radius={30}
+          blur={20}
+          gradient={{0.55: 'red', 0.85: 'yellow', 1.0: 'green'}}
+        />
+      )}
+      {pciLoading && <div className="text-center text-sm text-muted-foreground">Loading PCI data...</div>}
+      {pciError && <div className="text-center text-sm text-red-600">{pciError}</div>}
+
+      {/* Compliance Overlays (VDOT/ADA/DEQ) */}
+      <div className="absolute top-4 right-4 z-30 flex flex-col gap-2">
+        <Button size="sm" onClick={addComplianceZone}>Add Compliance Zone</Button>
+      </div>
+      {complianceZones && complianceZones.map(zone => (
+        <div
+          key={zone.id}
+          className={`absolute z-10 border-2 ${zone.compliant ? 'border-green-500' : 'border-red-500'}`}
+          style={{
+            left: zone.x,
+            top: zone.y,
+            width: zone.width,
+            height: zone.height,
+            background: zone.compliant ? 'rgba(0,255,0,0.3)' : 'rgba(255,0,0,0.3)',
+            filter: zone.compliant ? 'blur(2px)' : 'hue-rotate(180deg)',
+            borderRadius: '8px',
+            pointerEvents: 'auto',
+            cursor: 'pointer',
+          }}
+          title={zone.tooltip}
+          onClick={() => setEditingZone(zone)}
+          draggable
+          onDragEnd={e => updateComplianceZone(zone.id, { x: e.clientX, y: e.clientY })}
+        />
+      ))}
+      {editingZone && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-80">
+            <h3 className="font-bold mb-2">Edit Compliance Zone</h3>
+            <label className="block mb-2">Tooltip
+              <input className="w-full border p-1" value={editingZone.tooltip} onChange={e => updateComplianceZone(editingZone.id, { tooltip: e.target.value })} />
+            </label>
+            <label className="block mb-2">Compliant
+              <input type="checkbox" checked={editingZone.compliant} onChange={e => updateComplianceZone(editingZone.id, { compliant: e.target.checked })} />
+            </label>
+            <div className="flex gap-2 mt-4">
+              <Button size="sm" onClick={() => setEditingZone(null)}>Close</Button>
+              <Button size="sm" variant="destructive" onClick={() => deleteComplianceZone(editingZone.id)}>Delete</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pressure Wash Mode: Interactive dirty/clean zone drawing */}
+      {mapMode === 'pressure-wash' && dirtyZones && cleanZones && (
+        <PressureWashZoneDrawer
+          dirtyZones={dirtyZones}
+          cleanZones={cleanZones}
+          onDrawZone={handleDrawZone}
+          onPhotoUpload={handleBeforeAfterPhotoUpload}
+        />
+      )}
+
+      {/* Line Striping Templates */}
+      <LineStripingTemplateLibrary
+        onDropTemplate={handleDropLineTemplate}
+        selectedArea={selectedArea}
+      />
+
+      {/* AR Mode Toggle */}
+      <div className="fixed top-4 left-4 z-40">
+        <Button onClick={() => setArMode(v => !v)}>{arMode ? 'Exit AR Mode' : 'Enter AR Mode'}</Button>
+      </div>
+      {arMode && (
+        <ARProjection
+          type="measurement"
+          content="Area: 500 sq ft, Cost: $5,000"
+          position={{ lat: 100, lng: 200 }}
+          overlays={[
+            ...pciData.map(p => ({ type: 'pci', content: '', position: { lat: p.lat, lng: p.lng }, pciScore: p.pci })),
+            ...complianceZones.map(z => ({ type: 'compliance', content: z.tooltip, position: { lat: z.x, lng: z.y }, compliant: z.compliant, tooltip: z.tooltip })),
+            // Mock cracks
+            { type: 'crack', content: 'Crack Detected', position: { lat: 120, lng: 210 }, tooltip: 'Crack severity: High' }
+          ]}
+        />
+      )}
     </div>
   );
 };

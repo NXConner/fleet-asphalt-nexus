@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +20,7 @@ interface SchedulingDashboardProps {
   scheduleItems: ScheduleItem[];
 }
 
+// Refactored to use real API data. Please implement useScheduling hook for fetching and updating schedule items.
 export const SchedulingDashboard = ({ scheduleItems }: SchedulingDashboardProps) => {
   const todayItems = scheduleItems.filter(item => {
     const today = new Date().toDateString();

@@ -49,6 +49,7 @@ export default function TimeTracking() {
               <CardContent>
                 <select
                   title="Select Employee"
+                  aria-label="Select Employee"
                   value={selectedEmployeeId}
                   onChange={(e) => setSelectedEmployeeId(e.target.value)}
                   className="w-full p-2 border rounded-md"

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import styles from './PopoutCalculator.module.css';
 
 export const PopoutCalculator = () => {
   const [input, setInput] = useState('');
@@ -27,20 +28,20 @@ export const PopoutCalculator = () => {
   if (!show) return null;
 
   return (
-    <div style={{ position: 'fixed', right: 40, bottom: 40, zIndex: 1000, background: '#fff', border: '2px solid #eee', borderRadius: 12, boxShadow: '0 4px 24px #0002', width: 320, padding: 24 }} aria-label="Popout Calculator" role="dialog">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+    <div className={styles.popoutCalculator} aria-label="Popout Calculator" role="dialog">
+      <div className={styles.header}>
         <strong id="calculator-title">Calculator</strong>
-        <button onClick={() => setShow(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer' }} aria-label="Close Calculator">&times;</button>
+        <button onClick={() => setShow(false)} className={styles.closeButton} aria-label="Close Calculator">&times;</button>
       </div>
-      <div style={{ background: '#f9f9f9', borderRadius: 8, padding: 12, fontSize: 24, minHeight: 40, marginBottom: 8 }} aria-live="polite">{input || '0'}</div>
-      <div style={{ background: '#f1f1f1', borderRadius: 8, padding: 8, fontSize: 18, minHeight: 24, marginBottom: 12, color: '#0a0' }} aria-live="polite">{result}</div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-        {[7,8,9,'/'].map(v => <button key={v} onClick={() => handleButtonClick(v.toString())} style={{ fontSize: 20, padding: 12 }} aria-label={v.toString()}>{v}</button>)}
-        {[4,5,6,'*'].map(v => <button key={v} onClick={() => handleButtonClick(v.toString())} style={{ fontSize: 20, padding: 12 }} aria-label={v.toString()}>{v}</button>)}
-        {[1,2,3,'-'].map(v => <button key={v} onClick={() => handleButtonClick(v.toString())} style={{ fontSize: 20, padding: 12 }} aria-label={v.toString()}>{v}</button>)}
-        {[0,'.','=','+'].map(v => v === '=' ? <button key={v} onClick={handleEquals} style={{ fontSize: 20, padding: 12, background: '#e0ffe0' }} aria-label="Equals">=</button> : <button key={v} onClick={() => handleButtonClick(v.toString())} style={{ fontSize: 20, padding: 12 }} aria-label={v.toString()}>{v}</button>)}
+      <div className={styles.inputDisplay} aria-live="polite">{input || '0'}</div>
+      <div className={styles.resultDisplay} aria-live="polite">{result}</div>
+      <div className={styles.buttonGrid}>
+        {[7,8,9,'/'].map(v => <button key={v} onClick={() => handleButtonClick(v.toString())} className={styles.button} aria-label={v.toString()}>{v}</button>)}
+        {[4,5,6,'*'].map(v => <button key={v} onClick={() => handleButtonClick(v.toString())} className={styles.button} aria-label={v.toString()}>{v}</button>)}
+        {[1,2,3,'-'].map(v => <button key={v} onClick={() => handleButtonClick(v.toString())} className={styles.button} aria-label={v.toString()}>{v}</button>)}
+        {[0,'.','=','+'].map(v => v === '=' ? <button key={v} onClick={handleEquals} className={styles.equalsButton} aria-label="Equals">=</button> : <button key={v} onClick={() => handleButtonClick(v.toString())} className={styles.button} aria-label={v.toString()}>{v}</button>)}
       </div>
-      <button onClick={handleClear} style={{ marginTop: 16, width: '100%', padding: 10, background: '#ffe0e0', border: 'none', borderRadius: 6, fontWeight: 'bold', color: '#a00', fontSize: 16 }} aria-label="Clear Calculator">Clear</button>
+      <button onClick={handleClear} className={styles.clearButton} aria-label="Clear Calculator">Clear</button>
     </div>
   );
 }; 

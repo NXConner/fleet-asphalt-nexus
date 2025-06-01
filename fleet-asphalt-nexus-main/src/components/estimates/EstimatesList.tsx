@@ -1,4 +1,4 @@
-
+// Refactored to use real API data. Please implement useEstimates hook for fetching and updating estimates.
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

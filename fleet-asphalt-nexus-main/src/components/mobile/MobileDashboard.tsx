@@ -1,18 +1,22 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Truck, Users, AlertTriangle, DollarSign, MapPin, Clock } from 'lucide-react';
-import { enhancedVehicles, enhancedJobs } from '@/data/enhancedMockData';
 import { useCrossComponentLinks } from '@/hooks/useCrossComponentLinks';
+import { useFleetData } from '@/hooks/useFleetData';
+import { useJobsData } from '@/hooks/useJobsData';
 
 export const MobileDashboard = () => {
   const { linkToVehicle, linkToJob } = useCrossComponentLinks();
+  const { vehicles, isLoading: vehiclesLoading, error: vehiclesError } = useFleetData();
+  const { jobs, isLoading: jobsLoading, error: jobsError } = useJobsData();
+  if (vehiclesLoading || jobsLoading) return <div>Loading...</div>;
+  if (vehiclesError || jobsError) return <div>Error loading dashboard data</div>;
 
-  const activeVehicles = enhancedVehicles.filter(v => v.status === 'active');
-  const lowFuelVehicles = enhancedVehicles.filter(v => v.fuelLevel < 25);
-  const activeJobs = enhancedJobs.filter(j => j.status === 'in-progress');
+  const activeVehicles = vehicles.filter(v => v.status === 'active');
+  const lowFuelVehicles = vehicles.filter(v => v.fuelLevel < 25);
+  const activeJobs = jobs.filter(j => j.status === 'in-progress');
 
   return (
     <div className="space-y-4">

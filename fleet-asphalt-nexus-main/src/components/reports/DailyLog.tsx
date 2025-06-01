@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -317,6 +316,8 @@ NOTES: ${log.notes}
                       setCurrentLog({...currentLog, materials: updated});
                     }}
                     className="p-2 border rounded"
+                    aria-label="Unit"
+                    title="Unit"
                   >
                     <option value="tons">Tons</option>
                     <option value="yards">Cubic Yards</option>
@@ -365,6 +366,8 @@ NOTES: ${log.notes}
                       setCurrentLog({...currentLog, equipment: updated});
                     }}
                     className="p-2 border rounded"
+                    aria-label="Condition"
+                    title="Condition"
                   >
                     <option value="good">Good</option>
                     <option value="fair">Fair</option>

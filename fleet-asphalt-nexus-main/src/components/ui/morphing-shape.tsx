@@ -1,5 +1,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import styles from './MorphingShape.module.css';
 
 interface MorphingShapeProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "blob" | "polygon" | "star" | "heart" | "spiral" | "wave" | "DNA" | "infinity";
@@ -109,7 +110,8 @@ const MorphingShape = React.forwardRef<HTMLDivElement, MorphingShapeProps & { ro
           speedClasses[speed],
           animationClasses[animation],
           interactive && "cursor-pointer hover:scale-110",
-          className
+          className,
+          styles.shape
         )}
         style={{
           ...shapeStyles[variant],
@@ -123,9 +125,7 @@ const MorphingShape = React.forwardRef<HTMLDivElement, MorphingShapeProps & { ro
         {...props}
       >
         {/* Glow effect */}
-        <div className="absolute inset-0 -z-10 blur-lg opacity-50 animate-pulse" 
-             style={shapeStyles[variant]} />
-        
+        <div className={styles.glowEffect} style={shapeStyles[variant]} />
         {/* Inner light */}
         <div className="absolute inset-2 bg-white/20 rounded-full animate-ping" />
       </div>

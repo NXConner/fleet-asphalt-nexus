@@ -288,6 +288,57 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicles: {
+        Row: {
+          id: string;
+          name: string;
+          type: 'truck' | 'van' | 'trailer' | 'equipment';
+          status: 'active' | 'inactive' | 'maintenance' | 'out-of-service';
+          location: { lat: number; lng: number; address: string; lastUpdate: string };
+          driver?: string;
+          fuelLevel: number;
+          mileage: number;
+          maintenanceScore: number;
+          route?: string;
+          speed: number;
+          engineHours: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          type: 'truck' | 'van' | 'trailer' | 'equipment';
+          status: 'active' | 'inactive' | 'maintenance' | 'out-of-service';
+          location: { lat: number; lng: number; address: string; lastUpdate: string };
+          driver?: string;
+          fuelLevel: number;
+          mileage: number;
+          maintenanceScore: number;
+          route?: string;
+          speed: number;
+          engineHours: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          type?: 'truck' | 'van' | 'trailer' | 'equipment';
+          status?: 'active' | 'inactive' | 'maintenance' | 'out-of-service';
+          location?: { lat: number; lng: number; address: string; lastUpdate: string };
+          driver?: string;
+          fuelLevel?: number;
+          mileage?: number;
+          maintenanceScore?: number;
+          route?: string;
+          speed?: number;
+          engineHours?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      },
     }
     Views: {
       [_ in never]: never

@@ -1,20 +1,18 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Vehicle } from "@/types/fleet";
 import { MapPin, Navigation, Truck, AlertTriangle } from "lucide-react";
+import { useFleetData } from "@/hooks/useFleetData";
 
-interface LiveFleetMapProps {
-  vehicles: Vehicle[];
-}
-
-export function LiveFleetMap({ vehicles }: LiveFleetMapProps) {
+export function LiveFleetMap() {
+  const { vehicles, isLoading, error } = useFleetData();
+  if (isLoading) return <div>Loading vehicles...</div>;
+  if (error) return <div>Error loading vehicles</div>;
   const activeVehicles = vehicles.filter(v => v.status === 'active');
   const lowFuelVehicles = vehicles.filter(v => v.fuelLevel < 25);
   const maintenanceAlerts = vehicles.filter(v => v.status === 'maintenance');
 
-  const getStatusIndicator = (vehicle: Vehicle) => {
+  const getStatusIndicator = (vehicle) => {
     if (vehicle.fuelLevel < 25) return { color: 'bg-red-500', icon: AlertTriangle };
     if (vehicle.status === 'maintenance') return { color: 'bg-orange-500', icon: AlertTriangle };
     return { color: 'bg-green-500', icon: Truck };
@@ -63,7 +61,6 @@ export function LiveFleetMap({ vehicles }: LiveFleetMapProps) {
             {vehicles.slice(0, 4).map((vehicle) => {
               const status = getStatusIndicator(vehicle);
               const StatusIcon = status.icon;
-              
               return (
                 <div key={vehicle.id} className="flex items-center justify-between p-2 border rounded text-sm">
                   <div className="flex items-center gap-2">
@@ -79,7 +76,6 @@ export function LiveFleetMap({ vehicles }: LiveFleetMapProps) {
               );
             })}
           </div>
-          
           <Button variant="outline" className="w-full">
             View Full Map
           </Button>

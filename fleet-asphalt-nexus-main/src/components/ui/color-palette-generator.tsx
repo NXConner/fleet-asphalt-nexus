@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { Shuffle, Copy, Download, Palette, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import styles from './ColorPaletteGenerator.module.css';
 
 interface ColorPaletteGeneratorProps {
   className?: string;
@@ -154,7 +154,7 @@ export function ColorPaletteGenerator({ className }: ColorPaletteGeneratorProps)
                 className="w-full"
               />
               <div 
-                className="w-full h-8 rounded-md border"
+                className={styles.colorPreview}
                 style={{ backgroundColor: `hsl(${baseHue}, 70%, 50%)` }}
               />
             </div>

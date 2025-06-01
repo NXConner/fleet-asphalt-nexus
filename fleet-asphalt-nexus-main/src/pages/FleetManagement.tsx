@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,13 +9,15 @@ import { AdvancedFleetTracking } from "@/components/fleet/AdvancedFleetTracking"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResourceAllocation } from "@/components/dashboard/ResourceAllocation";
 import { DriverManagement } from "@/components/fleet/DriverManagement";
-import { mockVehicles, mockResources, mockDrivers } from "@/data/mockData";
 import { useDriverManagement } from "@/hooks/useDriverManagement";
+import { useResourceData } from "@/hooks/useResourceData";
+import { useFleetData } from "@/hooks/useFleetData";
 
 const FleetManagement = () => {
-  const [vehicles] = useState<Vehicle[]>(mockVehicles);
+  const { resources, isLoading: resourcesLoading, error: resourcesError } = useResourceData();
+  const { drivers, handleDriverSelect, isLoading: driversLoading, error: driversError } = useDriverManagement();
+  const { vehicles, isLoading: vehiclesLoading, error: vehiclesError } = useFleetData();
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
-  const { handleDriverSelect } = useDriverManagement();
 
   const fleetStats = {
     totalVehicles: vehicles.length,
@@ -29,6 +30,9 @@ const FleetManagement = () => {
     setSelectedVehicle(vehicle);
     console.log('Selected vehicle:', vehicle);
   };
+
+  if (resourcesLoading || driversLoading || vehiclesLoading) return <div>Loading...</div>;
+  if (resourcesError || driversError || vehiclesError) return <div>Error loading data</div>;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -97,8 +101,8 @@ const FleetManagement = () => {
 
         <TabsContent value="management" className="mt-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <ResourceAllocation resources={mockResources} />
-            <DriverManagement drivers={mockDrivers} onDriverSelect={handleDriverSelect} />
+            <ResourceAllocation resources={resources} />
+            <DriverManagement drivers={drivers} onDriverSelect={handleDriverSelect} />
           </div>
         </TabsContent>
       </Tabs>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -183,6 +182,8 @@ export const VehiclePhotoUpload = ({ vehicleId }: VehiclePhotoUploadProps) => {
                       accept="image/*"
                       onChange={handleFileSelect}
                       required
+                      title="Upload vehicle photo"
+                      placeholder="Choose a photo to upload"
                     />
                   </div>
 

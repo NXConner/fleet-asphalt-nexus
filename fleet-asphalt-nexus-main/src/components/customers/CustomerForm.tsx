@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -169,6 +168,8 @@ const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) => {
                 value={formData.status}
                 onChange={(e) => handleChange('status', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Status select"
+                title="Status select"
               >
                 <option value="prospect">Prospect</option>
                 <option value="active">Active</option>

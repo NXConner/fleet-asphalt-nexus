@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -73,6 +72,8 @@ export const CustomerList = ({ customers, onViewCustomer, onEditCustomer, onAddC
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-3 py-2 border rounded-md"
+            aria-label="Filter by status"
+            title="Filter by status"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>

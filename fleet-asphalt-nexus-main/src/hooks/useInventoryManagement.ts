@@ -1,139 +1,92 @@
-
-import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { InventoryItem, StockMovement, Supplier, PurchaseOrder } from '@/types/inventory';
-
-// Mock data
-const mockInventoryItems: InventoryItem[] = [
-  {
-    id: 'inv-001',
-    name: 'Hot Mix Asphalt',
-    description: 'Standard hot mix asphalt for road construction',
-    category: 'asphalt',
-    sku: 'HMA-001',
-    currentStock: 2500,
-    minimumStock: 500,
-    maximumStock: 5000,
-    unit: 'tons',
-    unitCost: 85.00,
-    totalValue: 212500,
-    supplierId: 'sup-001',
-    supplierName: 'ABC Asphalt Supply',
-    location: 'Warehouse A',
-    lastRestocked: '2024-01-20T00:00:00Z',
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-20T00:00:00Z'
-  },
-  {
-    id: 'inv-002',
-    name: 'Aggregate Base',
-    description: '21A aggregate base material',
-    category: 'aggregate',
-    sku: 'AGG-21A',
-    currentStock: 1800,
-    minimumStock: 300,
-    maximumStock: 3000,
-    unit: 'tons',
-    unitCost: 25.00,
-    totalValue: 45000,
-    supplierId: 'sup-002',
-    supplierName: 'Rock & Stone Co.',
-    location: 'Yard B',
-    lastRestocked: '2024-01-15T00:00:00Z',
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-15T00:00:00Z'
-  }
-];
-
-const mockSuppliers: Supplier[] = [
-  {
-    id: 'sup-001',
-    name: 'ABC Asphalt Supply',
-    contactPerson: 'John Smith',
-    email: 'john@abcasphalt.com',
-    phone: '(555) 123-4567',
-    address: {
-      street: '123 Industrial Way',
-      city: 'Richmond',
-      state: 'VA',
-      zipCode: '23230'
-    },
-    paymentTerms: 'Net 30',
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  }
-];
+import { useCallback } from 'react';
 
 export const useInventoryManagement = () => {
-  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>(mockInventoryItems);
-  const [stockMovements, setStockMovements] = useState<StockMovement[]>([]);
-  const [suppliers, setSuppliers] = useState<Supplier[]>(mockSuppliers);
-  const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>([]);
+  const queryClient = useQueryClient();
 
-  const addInventoryItem = useCallback((item: Omit<InventoryItem, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newItem: InventoryItem = {
-      ...item,
-      id: `inv-${Date.now()}`,
-      totalValue: item.currentStock * item.unitCost,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    
-    setInventoryItems(prev => [...prev, newItem]);
-    return newItem;
-  }, []);
+  // Inventory Items
+  const { data: inventoryItems = [], isLoading: inventoryLoading, error: inventoryError } = useQuery({
+    queryKey: ['inventory-items'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('inventory_items').select('*');
+      if (error) throw error;
+      return data as InventoryItem[];
+    }
+  });
 
-  const updateInventoryItem = useCallback((id: string, updates: Partial<InventoryItem>) => {
-    setInventoryItems(prev => 
-      prev.map(item => {
-        if (item.id === id) {
-          const updatedItem = { ...item, ...updates, updatedAt: new Date().toISOString() };
-          updatedItem.totalValue = updatedItem.currentStock * updatedItem.unitCost;
-          return updatedItem;
-        }
-        return item;
-      })
-    );
-  }, []);
+  // Suppliers
+  const { data: suppliers = [], isLoading: suppliersLoading, error: suppliersError } = useQuery({
+    queryKey: ['suppliers'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('suppliers').select('*');
+      if (error) throw error;
+      return data as Supplier[];
+    }
+  });
 
-  const recordStockMovement = useCallback((movement: Omit<StockMovement, 'id' | 'date'>) => {
-    const newMovement: StockMovement = {
-      ...movement,
-      id: `mov-${Date.now()}`,
-      date: new Date().toISOString()
-    };
+  // Stock Movements
+  const { data: stockMovements = [], isLoading: stockMovementsLoading, error: stockMovementsError } = useQuery({
+    queryKey: ['stock-movements'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('stock_movements').select('*');
+      if (error) throw error;
+      return data as StockMovement[];
+    }
+  });
 
-    setStockMovements(prev => [...prev, newMovement]);
+  // Add Inventory Item
+  const addInventoryItem = useMutation({
+    mutationFn: async (item: Omit<InventoryItem, 'id'>) => {
+      const { data, error } = await supabase.from('inventory_items').insert(item).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['inventory-items'] })
+  });
 
-    // Update inventory levels
-    setInventoryItems(prev => 
-      prev.map(item => {
-        if (item.id === movement.itemId) {
-          let newStock = item.currentStock;
-          if (movement.type === 'in') {
-            newStock += movement.quantity;
-          } else if (movement.type === 'out') {
-            newStock -= movement.quantity;
-          } else {
-            newStock = movement.quantity; // adjustment sets absolute value
-          }
-          
-          return {
-            ...item,
-            currentStock: Math.max(0, newStock),
-            totalValue: Math.max(0, newStock) * item.unitCost,
-            updatedAt: new Date().toISOString()
-          };
-        }
-        return item;
-      })
-    );
+  // Update Inventory Item
+  const updateInventoryItem = useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<InventoryItem> & { id: string }) => {
+      const { data, error } = await supabase.from('inventory_items').update(updates).eq('id', id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['inventory-items'] })
+  });
 
-    return newMovement;
-  }, []);
+  // Record Stock Movement
+  const recordStockMovement = useMutation({
+    mutationFn: async (movement: Omit<StockMovement, 'id'>) => {
+      const { data, error } = await supabase.from('stock_movements').insert(movement).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['stock-movements'] })
+  });
 
+  // Add Supplier
+  const addSupplier = useMutation({
+    mutationFn: async (supplier: Omit<Supplier, 'id'>) => {
+      const { data, error } = await supabase.from('suppliers').insert(supplier).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['suppliers'] })
+  });
+
+  // Update Supplier
+  const updateSupplier = useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<Supplier> & { id: string }) => {
+      const { data, error } = await supabase.from('suppliers').update(updates).eq('id', id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['suppliers'] })
+  });
+
+  // Utility functions
   const getLowStockItems = useCallback(() => {
     return inventoryItems.filter(item => item.currentStock <= item.minimumStock && item.isActive);
   }, [inventoryItems]);
@@ -142,33 +95,16 @@ export const useInventoryManagement = () => {
     return inventoryItems.reduce((total, item) => total + item.totalValue, 0);
   }, [inventoryItems]);
 
-  const addSupplier = useCallback((supplier: Omit<Supplier, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newSupplier: Supplier = {
-      ...supplier,
-      id: `sup-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    
-    setSuppliers(prev => [...prev, newSupplier]);
-    return newSupplier;
-  }, []);
-
-  const updateSupplier = useCallback((id: string, updates: Partial<Supplier>) => {
-    setSuppliers(prev => 
-      prev.map(supplier => 
-        supplier.id === id 
-          ? { ...supplier, ...updates, updatedAt: new Date().toISOString() }
-          : supplier
-      )
-    );
-  }, []);
-
   return {
     inventoryItems,
-    stockMovements,
+    inventoryLoading,
+    inventoryError,
     suppliers,
-    purchaseOrders,
+    suppliersLoading,
+    suppliersError,
+    stockMovements,
+    stockMovementsLoading,
+    stockMovementsError,
     addInventoryItem,
     updateInventoryItem,
     recordStockMovement,

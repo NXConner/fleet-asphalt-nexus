@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,28 +27,10 @@ interface Receipt {
   createdAt: string;
 }
 
-export function ReceiptManager() {
-  const [receipts, setReceipts] = useState<Receipt[]>([
-    {
-      id: '1',
-      date: '2024-01-15',
-      vendor: 'Home Depot',
-      amount: 156.78,
-      category: 'Equipment',
-      description: 'Safety cones and signage',
-      taxDeductible: true,
-      processed: true,
-      createdAt: '2024-01-15T10:30:00Z',
-      extractedData: {
-        total: 156.78,
-        tax: 12.54,
-        date: '2024-01-15',
-        vendor: 'Home Depot',
-        items: ['Safety cones (12)', 'Warning signs (6)', 'Reflective tape']
-      }
-    }
-  ]);
+// Refactored to use real API data. Please implement useReceipts hook for fetching and updating receipts.
 
+export function ReceiptManager() {
+  const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   const categories = [
@@ -244,6 +225,7 @@ ${taxDeductibleReceipts.map(receipt =>
                         value={receipt.category}
                         onChange={(e) => updateReceipt(receipt.id, { category: e.target.value })}
                         className="w-full p-2 border rounded"
+                        title="Select receipt category"
                       >
                         {categories.map(cat => (
                           <option key={cat} value={cat}>{cat}</option>

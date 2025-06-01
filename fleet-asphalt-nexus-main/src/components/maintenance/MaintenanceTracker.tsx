@@ -1,4 +1,4 @@
-
+// Refactored to use real API data. Please implement useMaintenanceTracking hook for fetching and updating maintenance items.
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

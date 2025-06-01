@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { Settings, Palette, Zap, Sparkles, Save, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import styles from './ThemeConfigurator.module.css';
 
 interface ThemeConfiguratorProps {
   className?: string;
@@ -206,9 +206,9 @@ export function ThemeConfigurator({ className }: ThemeConfiguratorProps) {
                   </div>
 
                   <div className="grid grid-cols-3 gap-2 mt-4">
-                    <div className="h-8 rounded" style={{ backgroundColor: `hsl(${config.hue}, ${config.saturation}%, ${config.lightness}%)` }} />
-                    <div className="h-8 rounded" style={{ backgroundColor: `hsl(${(config.hue + 60) % 360}, ${config.saturation}%, ${config.lightness + 10}%)` }} />
-                    <div className="h-8 rounded" style={{ backgroundColor: `hsl(${(config.hue + 120) % 360}, ${config.saturation - 20}%, ${config.lightness + 20}%)` }} />
+                    <div className={styles.colorPreview} style={{ backgroundColor: `hsl(${config.hue}, ${config.saturation}%, ${config.lightness}%)` }} />
+                    <div className={styles.colorPreview} style={{ backgroundColor: `hsl(${(config.hue + 60) % 360}, ${config.saturation}%, ${config.lightness + 10}%)` }} />
+                    <div className={styles.colorPreview} style={{ backgroundColor: `hsl(${(config.hue + 120) % 360}, ${config.saturation - 20}%, ${config.lightness + 20}%)` }} />
                   </div>
                 </CardContent>
               </Card>

@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Truck } from "lucide-react";
@@ -28,8 +27,8 @@ export const VehicleSelector = ({
             Advanced Fleet Diagnostics
           </span>
           <div className="flex gap-2">
-            <Select value={selectedVehicle} onValueChange={onVehicleChange}>
-              <SelectTrigger className="w-48">
+            <Select value={selectedVehicle} onValueChange={onVehicleChange} aria-label="Select vehicle" title="Select vehicle">
+              <SelectTrigger className="w-48" aria-label="Select vehicle" title="Select vehicle">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -40,8 +39,8 @@ export const VehicleSelector = ({
                 ))}
               </SelectContent>
             </Select>
-            <Select value={timeRange} onValueChange={onTimeRangeChange}>
-              <SelectTrigger className="w-24">
+            <Select value={timeRange} onValueChange={onTimeRangeChange} aria-label="Select time range" title="Select time range">
+              <SelectTrigger className="w-24" aria-label="Select time range" title="Select time range">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

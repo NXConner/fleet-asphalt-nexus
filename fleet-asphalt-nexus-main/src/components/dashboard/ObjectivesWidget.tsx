@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -185,7 +184,13 @@ export function ObjectivesWidget() {
                 <Input name="title" placeholder="Objective title" required />
                 <Input name="description" placeholder="Description" required />
                 <div className="grid grid-cols-2 gap-2">
-                  <select name="priority" required className="p-2 border rounded">
+                  <select
+                    aria-label="Objective status select"
+                    title="Objective status select"
+                    name="priority"
+                    required
+                    className="p-2 border rounded"
+                  >
                     <option value="high">High Priority</option>
                     <option value="medium">Medium Priority</option>
                     <option value="low">Low Priority</option>

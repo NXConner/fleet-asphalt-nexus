@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { saveAs } from 'file-saver';
 import { evaluate, parse } from 'mathjs';
+import styles from './SealcoatingSpreadsheetApp.module.css';
 
 interface SealcoatingSpreadsheetAppProps {
   onCellSelect?: (value: any) => void;
@@ -206,32 +207,24 @@ export const SealcoatingSpreadsheetApp: React.FC<SealcoatingSpreadsheetAppProps>
   }
 
   return (
-    <div style={{ overflowX: 'auto', background: '#fff', border: '1px solid #eee', borderRadius: 8, margin: 16, padding: 16 }}>
+    <div className={styles.spreadsheetContainer}>
       <strong>Sealcoating Spreadsheet</strong>
-      <div style={{ margin: '12px 0' }}>
+      <div className={styles.sheetControls}>
         {sheets.map(sheet => (
           <button
             key={sheet}
             onClick={() => handleSheetChange(sheet)}
-            style={{
-              marginRight: 8,
-              padding: '6px 16px',
-              borderRadius: 6,
-              border: sheet === activeSheet ? '2px solid #1890ff' : '1px solid #ccc',
-              background: sheet === activeSheet ? '#e6f7ff' : '#f9f9f9',
-              fontWeight: sheet === activeSheet ? 'bold' : 'normal',
-              cursor: 'pointer'
-            }}
+            className={sheet === activeSheet ? styles.activeSheetButton : styles.sheetButton}
           >
             {sheet}
           </button>
         ))}
-        <button onClick={handleExportCSV} style={{ marginLeft: 16, padding: '6px 16px', borderRadius: 6, border: '1px solid #52c41a', background: '#f6ffed', color: '#389e0d', fontWeight: 'bold', cursor: 'pointer' }}>Export CSV</button>
-        <label style={{ marginLeft: 8, padding: '6px 16px', borderRadius: 6, border: '1px solid #1890ff', background: '#e6f7ff', color: '#1890ff', fontWeight: 'bold', cursor: 'pointer' }}>
+        <button onClick={handleExportCSV} className={styles.exportButton}>Export CSV</button>
+        <label className={styles.importLabel}>
           Import CSV
-          <input type="file" accept=".csv" onChange={handleImportCSV} style={{ display: 'none' }} />
+          <input type="file" accept=".csv" onChange={handleImportCSV} className={styles.importInput} />
         </label>
-        <button onClick={handleResetSheet} style={{ marginLeft: 8, padding: '6px 16px', borderRadius: 6, border: '1px solid #ff4d4f', background: '#fff1f0', color: '#cf1322', fontWeight: 'bold', cursor: 'pointer' }}>Reset Sheet</button>
+        <button onClick={handleResetSheet} className={styles.resetButton}>Reset Sheet</button>
       </div>
       <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 12 }}>
         <tbody>

@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,17 +30,22 @@ import { AdvancedCard } from "./advanced-card";
 import { ParticleSystem } from "./particle-system";
 import { InteractiveBackground } from "./interactive-background";
 import { cn } from "@/lib/utils";
+import ThemeColorPicker from "./ThemeColorPicker";
 
 interface ThemeIntegrationProps {
   showLivePreview?: boolean;
   enableCustomization?: boolean;
   allowExport?: boolean;
+  onSidebarBgChange?: (bgClass: string) => void;
+  sidebarBgClass?: string;
 }
 
 export function ThemeIntegration({ 
   showLivePreview = true,
   enableCustomization = true,
-  allowExport = true 
+  allowExport = true,
+  onSidebarBgChange,
+  sidebarBgClass
 }: ThemeIntegrationProps) {
   const { theme } = useTheme();
   const [activeTab, setActiveTab] = React.useState("showcase");
@@ -58,6 +62,8 @@ export function ThemeIntegration({
     fps: [60],
     complexity: [70],
   });
+  const [showColorPicker, setShowColorPicker] = React.useState(false);
+  const [sidebarBg, setSidebarBg] = React.useState(sidebarBgClass || 'bg-gradient-primary');
 
   const exportThemeConfig = () => {
     const config = {
@@ -268,6 +274,20 @@ export function ThemeIntegration({
                 </AdvancedCard>
               </div>
             )}
+            <div className="flex justify-end pt-4">
+              <button
+                className="px-4 py-2 bg-accent text-primary rounded shadow hover:bg-accent/80 transition-all duration-200 border border-accent focus:outline-none focus:ring-2 focus:ring-primary/50"
+                onClick={() => setShowColorPicker(true)}
+                aria-label="Open Theme Color Picker"
+              >
+                🎨 Open Color Picker
+              </button>
+            </div>
+            {showColorPicker && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                <ThemeColorPicker onClose={() => setShowColorPicker(false)} inputTitle="Pick theme color" />
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="effects" className="space-y-6">
@@ -318,6 +338,8 @@ export function ThemeIntegration({
                         accept=".json"
                         onChange={importThemeConfig}
                         className="absolute inset-0 opacity-0 cursor-pointer"
+                        title="Import theme configuration file"
+                        aria-label="Import theme configuration file"
                       />
                       <PremiumButton variant="crystalline" className="gap-2">
                         <Upload className="h-4 w-4" />
@@ -339,6 +361,16 @@ export function ThemeIntegration({
             )}
           </TabsContent>
         </Tabs>
+
+        <div className="mt-6">
+          <label className="block font-semibold mb-2">Sidebar Background Style</label>
+          <div className="flex gap-2">
+            <button className={`px-3 py-2 rounded ${sidebarBg === 'bg-gradient-primary' ? 'ring-2 ring-primary' : ''}`} onClick={() => { setSidebarBg('bg-gradient-primary'); onSidebarBgChange?.('bg-gradient-primary'); }}>Gradient</button>
+            <button className={`px-3 py-2 rounded ${sidebarBg === 'pattern-dots' ? 'ring-2 ring-primary' : ''}`} onClick={() => { setSidebarBg('pattern-dots'); onSidebarBgChange?.('pattern-dots'); }}>Pattern</button>
+            <button className={`px-3 py-2 rounded ${sidebarBg === 'bg-card' ? 'ring-2 ring-primary' : ''}`} onClick={() => { setSidebarBg('bg-card'); onSidebarBgChange?.('bg-card'); }}>Solid</button>
+          </div>
+          <div className={`mt-4 h-12 w-full rounded ${sidebarBg}`}></div>
+        </div>
       </div>
     </div>
   );

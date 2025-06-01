@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock } from "lucide-react";
@@ -30,6 +29,7 @@ interface MockTimeSummary {
   total_miles: number;
 }
 
+// Refactored to use real API data. Please implement useTimeTracking hook for fetching and updating time entries and summaries.
 export const EmployeeTimeTracker = ({ employeeId, employeeName }: EmployeeTimeTrackerProps) => {
   const { currentLocation, isTracking, startLocationTracking, stopLocationTracking } = useLocationTracking();
   const [activityType, setActivityType] = useState<'on_site' | 'travel' | 'shop' | 'break' | 'lunch'>('on_site');

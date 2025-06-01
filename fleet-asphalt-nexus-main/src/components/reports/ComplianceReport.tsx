@@ -18,8 +18,8 @@ export default function ComplianceReport() {
             <li key={r.id}>{r.name} ({r.date})</li>
           ))}
         </ul>
-        <Button>Export PDF</Button>
-        <Button variant="outline" className="ml-2">Export CSV</Button>
+        <Button title="Export PDF">Export PDF</Button>
+        <Button variant="outline" className="ml-2" title="Export CSV">Export CSV</Button>
       </CardContent>
     </Card>
   );

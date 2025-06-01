@@ -28,42 +28,7 @@ const Estimates = () => {
     searchTerm: ''
   });
 
-  const [estimates, setEstimates] = useState([
-    {
-      id: "EST-001",
-      clientName: "ABC Construction",
-      projectType: "Parking Lot",
-      location: "123 Business Park",
-      amount: 25000,
-      status: "Pending",
-      date: "2024-01-15",
-      expiryDate: "2024-02-15",
-      description: "New parking lot construction with drainage"
-    },
-    {
-      id: "EST-002",
-      clientName: "City Municipality",
-      projectType: "Road Repair",
-      location: "Main Street",
-      amount: 45000,
-      status: "Approved",
-      date: "2024-01-20",
-      expiryDate: "2024-02-20",
-      description: "Pothole repairs and resurfacing"
-    },
-    {
-      id: "EST-003",
-      clientName: "Residential Client",
-      projectType: "Driveway",
-      location: "456 Oak Avenue",
-      amount: 8500,
-      status: "Draft",
-      date: "2024-01-25",
-      expiryDate: "2024-02-25",
-      description: "Residential driveway paving"
-    }
-  ]);
-
+  const [estimates, setEstimates] = useState([]);
   const [showSpreadsheet, setShowSpreadsheet] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
 

@@ -1,5 +1,5 @@
-
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CostData {
   id: string;
@@ -21,72 +21,59 @@ interface LinkedCostData {
 }
 
 export const useCostData = () => {
-  const [costData, setCostData] = useState<CostData[]>([]);
-  const [linkedData, setLinkedData] = useState<Map<string, LinkedCostData>>(new Map());
+  const queryClient = useQueryClient();
 
-  // Mock cost data - this would come from the database
-  const mockCostData: CostData[] = [
-    {
-      id: '1',
-      item_type: 'fuel',
-      item_name: 'Diesel Fuel',
-      current_price: 3.85,
-      price_with_tax: 4.13,
-      unit: 'gallon',
-      location_state: 'VA',
-      last_updated: new Date().toISOString()
-    },
-    {
-      id: '2',
-      item_type: 'material',
-      item_name: 'Coal Tar Sealer',
-      current_price: 1.95,
-      price_with_tax: 2.05,
-      unit: 'gallon',
-      location_state: 'VA',
-      last_updated: new Date().toISOString()
-    },
-    {
-      id: '3',
-      item_type: 'labor',
-      item_name: 'Crew Leader',
-      current_price: 29.50,
-      price_with_tax: 29.50,
-      unit: 'hour',
-      location_state: 'VA',
-      last_updated: new Date().toISOString()
+  const { data: costData = [], isLoading, error } = useQuery({
+    queryKey: ['cost-data'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('cost_data').select('*');
+      if (error) throw error;
+      return data;
     }
-  ];
+  });
 
-  useEffect(() => {
-    setCostData(mockCostData);
-  }, []);
+  // Add/Update/Delete mutations can be added here as needed
 
   const getCostByType = (type: string) => {
-    return costData.filter(item => item.item_type === type);
+    return costData.filter((item: any) => item.item_type === type);
   };
 
   const getCostByName = (name: string) => {
-    return costData.find(item => item.item_name.toLowerCase().includes(name.toLowerCase()));
+    return costData.find((item: any) => item.item_name.toLowerCase().includes(name.toLowerCase()));
   };
 
   const linkCostsToJob = (jobId: string, costs: CostData[]) => {
     const totalCost = costs.reduce((sum, cost) => sum + cost.price_with_tax, 0);
-    setLinkedData(prev => new Map(prev.set(jobId, { jobId, costs, totalCost })));
+    queryClient.setQueryData(['linked-data'], (prevData: Map<string, LinkedCostData> | undefined) => {
+      if (prevData) {
+        return new Map(prevData.set(jobId, { jobId, costs, totalCost }));
+      }
+      return new Map();
+    });
   };
 
   const linkCostsToEmployee = (employeeId: string, costs: CostData[]) => {
     const totalCost = costs.reduce((sum, cost) => sum + cost.price_with_tax, 0);
-    setLinkedData(prev => new Map(prev.set(`employee-${employeeId}`, { employeeId, costs, totalCost })));
+    queryClient.setQueryData(['linked-data'], (prevData: Map<string, LinkedCostData> | undefined) => {
+      if (prevData) {
+        return new Map(prevData.set(`employee-${employeeId}`, { employeeId, costs, totalCost }));
+      }
+      return new Map();
+    });
   };
 
   const linkCostsToVehicle = (vehicleId: string, costs: CostData[]) => {
     const totalCost = costs.reduce((sum, cost) => sum + cost.price_with_tax, 0);
-    setLinkedData(prev => new Map(prev.set(`vehicle-${vehicleId}`, { vehicleId, costs, totalCost })));
+    queryClient.setQueryData(['linked-data'], (prevData: Map<string, LinkedCostData> | undefined) => {
+      if (prevData) {
+        return new Map(prevData.set(`vehicle-${vehicleId}`, { vehicleId, costs, totalCost }));
+      }
+      return new Map();
+    });
   };
 
   const getLinkedCosts = (id: string): LinkedCostData | undefined => {
-    return linkedData.get(id) || linkedData.get(`employee-${id}`) || linkedData.get(`vehicle-${id}`);
+    return queryClient.getQueryData(['linked-data'])?.get(id) || queryClient.getQueryData(['linked-data'])?.get(`employee-${id}`) || queryClient.getQueryData(['linked-data'])?.get(`vehicle-${id}`);
   };
 
   const calculateJobCost = (materialCosts: number, laborHours: number, fuelConsumption: number) => {
@@ -113,7 +100,8 @@ export const useCostData = () => {
 
   return {
     costData,
-    linkedData,
+    isLoading,
+    error,
     getCostByType,
     getCostByName,
     linkCostsToJob,

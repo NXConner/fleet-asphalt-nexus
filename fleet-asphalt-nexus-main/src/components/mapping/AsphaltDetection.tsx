@@ -13,6 +13,7 @@ import {
   Square,
   Move
 } from "lucide-react";
+import CrackDetectionAR from './CrackDetectionAR';
 
 interface AsphaltArea {
   id: string;
@@ -22,6 +23,7 @@ interface AsphaltArea {
   width: number;
   confidence?: number;
   manuallyEdited: boolean;
+  pciScore?: number;
 }
 
 interface AsphaltDetectionProps {
@@ -33,12 +35,14 @@ interface AsphaltDetectionProps {
 export function AsphaltDetection({ onAreaSelect, showEmployeeTracking = false, highlight = false }: AsphaltDetectionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDetecting, setIsDetecting] = useState(false);
-  const [editMode, setEditMode] = useState<'select' | 'edit' | 'draw'>('select');
+  const [editMode, setEditMode] = useState<'select' | 'edit' | 'draw' | 'ar-crack'>('select');
   const [detectedAreas, setDetectedAreas] = useState<AsphaltArea[]>([]);
   const [selectedArea, setSelectedArea] = useState<AsphaltArea | null>(null);
   const [confidence, setConfidence] = useState([85]);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentPath, setCurrentPath] = useState<Array<{x: number, y: number}>>([]);
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [complianceZones, setComplianceZones] = useState<{id: string, x: number, y: number, width: number, height: number, compliant: boolean, tooltip: string}[]>([]);
 
   const runAutoDetection = async () => {
     setIsDetecting(true);
@@ -264,6 +268,14 @@ export function AsphaltDetection({ onAreaSelect, showEmployeeTracking = false, h
     };
   };
 
+  const handleCrackDetection = (result: string) => {
+    // Implementation of handleCrackDetection
+  };
+
+  const handlePCIScore = (score: number) => {
+    // Implementation of handlePCIScore
+  };
+
   return (
     <div className="space-y-4">
       {/* Controls */}
@@ -403,6 +415,52 @@ export function AsphaltDetection({ onAreaSelect, showEmployeeTracking = false, h
           </CardContent>
         </Card>
       )}
+
+      {/* AR Crack Detection */}
+      {editMode === 'ar-crack' && (
+        <CrackDetectionAR
+          onDetect={handleCrackDetection}
+          onScorePCI={handlePCIScore}
+          region={selectedRegion}
+        />
+      )}
+
+      {/* PCI Score calculation and overlay */}
+      {detectedAreas.map(area => (
+        <div
+          key={area.id}
+          className="absolute z-20"
+          style={{
+            left: area.coordinates[0].x,
+            top: area.coordinates[0].y,
+            width: area.width,
+            height: area.length,
+            background: `rgba(0,255,0,${area.pciScore ? area.pciScore / 100 : 0})`,
+            border: '2px solid #00FF00',
+            pointerEvents: 'none',
+          }}
+          title={`PCI: ${area.pciScore ? Math.round(area.pciScore) : 'N/A'}`}
+        />
+      ))}
+
+      {/* Compliance overlays and tooltips */}
+      {complianceZones.map(zone => (
+        <div
+          key={zone.id}
+          className="absolute z-10"
+          style={{
+            left: zone.x,
+            top: zone.y,
+            width: zone.width,
+            height: zone.height,
+            background: zone.compliant ? 'rgba(0,255,0,0.3)' : 'rgba(255,0,0,0.3)',
+            filter: zone.compliant ? 'blur(2px)' : 'hue-rotate(180deg)',
+            borderRadius: '8px',
+            pointerEvents: 'auto',
+          }}
+          title={zone.tooltip}
+        />
+      ))}
     </div>
   );
 }

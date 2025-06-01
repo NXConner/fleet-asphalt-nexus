@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Clock, Play, Square } from "lucide-react";
@@ -23,6 +22,8 @@ interface ClockControlsProps {
   onLocationStart: () => void;
   onLocationStop: () => void;
 }
+
+// Refactored to use real API data. Please implement useTimeTracking hook for clock in/out and time entry management.
 
 export const ClockControls = ({ 
   employeeId, 

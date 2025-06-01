@@ -1,17 +1,23 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Truck, AlertTriangle, DollarSign, Clock, TrendingUp } from "lucide-react";
 import { useCrossComponentLinks } from "@/hooks/useCrossComponentLinks";
-import { enhancedVehicles, enhancedJobs, enhancedMaintenanceRecords } from "@/data/enhancedMockData";
+import { useFleetData } from "@/hooks/useFleetData";
+import { useJobsData } from "@/hooks/useJobsData";
+import { useMaintenanceRecordsData } from "@/hooks/useMaintenanceRecordsData";
 
 export const EnhancedDashboard = () => {
   const { linkToVehicle, linkToJob, linkToMaintenance } = useCrossComponentLinks();
+  const { vehicles, isLoading: vehiclesLoading, error: vehiclesError } = useFleetData();
+  const { jobs, isLoading: jobsLoading, error: jobsError } = useJobsData();
+  const { maintenanceRecords, isLoading: maintenanceLoading, error: maintenanceError } = useMaintenanceRecordsData();
+  if (vehiclesLoading || jobsLoading || maintenanceLoading) return <div>Loading...</div>;
+  if (vehiclesError || jobsError || maintenanceError) return <div>Error loading dashboard data</div>;
 
-  const activeVehicles = enhancedVehicles.filter(v => v.status === 'active');
-  const criticalMaintenanceCount = enhancedMaintenanceRecords.filter(m => m.priority === 'critical').length;
-  const activeJobsCount = enhancedJobs.filter(j => j.status === 'in-progress').length;
+  const activeVehicles = vehicles.filter(v => v.status === 'active');
+  const criticalMaintenanceCount = maintenanceRecords.filter(m => m.priority === 'critical').length;
+  const activeJobsCount = jobs.filter(j => j.status === 'in-progress').length;
 
   return (
     <div className="space-y-6">
@@ -22,7 +28,7 @@ export const EnhancedDashboard = () => {
             <div className="flex items-center gap-2">
               <Truck className="h-5 w-5 text-blue-600" />
               <div>
-                <div className="text-2xl font-bold">{enhancedVehicles.length}</div>
+                <div className="text-2xl font-bold">{activeVehicles.length}</div>
                 <div className="text-sm text-muted-foreground">Total Vehicles</div>
               </div>
             </div>
@@ -82,7 +88,7 @@ export const EnhancedDashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {enhancedJobs.filter(job => job.status === 'in-progress').map((job) => (
+            {jobs.filter(job => job.status === 'in-progress').map((job) => (
               <div 
                 key={job.id} 
                 className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
@@ -147,3 +153,5 @@ export const EnhancedDashboard = () => {
     </div>
   );
 };
+
+export default EnhancedDashboard;

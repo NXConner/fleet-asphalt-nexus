@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -191,15 +190,28 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    font-smooth: always;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   html {
     scroll-behavior: smooth;
-    scrollbar-width: thin;
+    scrollbar-width: thin; /* Not supported in all browsers */
     scrollbar-color: hsl(var(--muted)) transparent;
+    /* For Webkit browsers */
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    &::-webkit-scrollbar-track {
+      @apply bg-transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      @apply bg-muted rounded-full border-2 border-transparent bg-clip-content;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      @apply bg-muted-foreground/50;
+    }
   }
 
   /* Enhanced focus styles */
@@ -212,22 +224,24 @@
     @apply bg-primary/20 text-primary-foreground;
   }
 
-  /* Enhanced scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+  /* Add -webkit-backdrop-filter for Safari/iOS */
+  .glass-enhanced, .glass-morphic, .crystalline, .backdrop-enhanced {
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    backdrop-filter: blur(25px) saturate(180%);
   }
 
-  ::-webkit-scrollbar-track {
-    @apply bg-transparent;
+  /* Add -webkit-backdrop-filter for all backdrop-filter usages */
+  .glass {
+    -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(120%);
+    backdrop-filter: blur(20px) saturate(180%) brightness(120%);
   }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-muted rounded-full border-2 border-transparent bg-clip-content;
+  .glass-card {
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    backdrop-filter: blur(25px) saturate(180%);
   }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/50;
+  .crystalline {
+    -webkit-backdrop-filter: blur(30px) brightness(110%) contrast(110%) saturate(130%);
+    backdrop-filter: blur(30px) brightness(110%) contrast(110%) saturate(130%);
   }
 }
 
@@ -387,6 +401,7 @@
 
   .glass-enhanced {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
     backdrop-filter: blur(25px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
@@ -394,6 +409,7 @@
 
   .glass-morphic {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(120%);
     backdrop-filter: blur(20px) saturate(180%) brightness(120%);
     border: 1px solid rgba(255, 255, 255, 0.25);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -402,6 +418,7 @@
   /* Crystalline effects */
   .crystalline {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    -webkit-backdrop-filter: blur(30px) brightness(110%) contrast(110%) saturate(130%);
     backdrop-filter: blur(30px) brightness(110%) contrast(110%) saturate(130%);
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 
@@ -629,6 +646,7 @@
 
   /* Backdrop effects */
   .backdrop-enhanced {
+    -webkit-backdrop-filter: blur(25px) saturate(180%) brightness(120%);
     backdrop-filter: blur(25px) saturate(180%) brightness(120%);
     background: rgba(255, 255, 255, 0.1);
   }
@@ -922,6 +940,7 @@
   .crystalline {
     background: hsl(var(--background));
     border: 2px solid hsl(var(--border));
+    -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
 }

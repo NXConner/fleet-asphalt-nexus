@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -128,6 +127,8 @@ export const InvoiceForm = ({ invoice, onSave, onCancel }: InvoiceFormProps) => 
                 id="invoiceNumber"
                 value={formData.invoiceNumber}
                 onChange={(e) => setFormData(prev => ({ ...prev, invoiceNumber: e.target.value }))}
+                title="Invoice Number"
+                placeholder="Enter invoice number"
               />
             </div>
             <div>
@@ -137,6 +138,8 @@ export const InvoiceForm = ({ invoice, onSave, onCancel }: InvoiceFormProps) => 
                 type="date"
                 value={formData.dueDate}
                 onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+                title="Due Date"
+                placeholder="Select due date"
               />
             </div>
           </div>
@@ -151,6 +154,8 @@ export const InvoiceForm = ({ invoice, onSave, onCancel }: InvoiceFormProps) => 
                   id="customerName"
                   value={formData.customerName}
                   onChange={(e) => setFormData(prev => ({ ...prev, customerName: e.target.value }))}
+                  title="Customer Name"
+                  placeholder="Enter customer name"
                 />
               </div>
               <div>
@@ -160,6 +165,8 @@ export const InvoiceForm = ({ invoice, onSave, onCancel }: InvoiceFormProps) => 
                   type="email"
                   value={formData.customerEmail}
                   onChange={(e) => setFormData(prev => ({ ...prev, customerEmail: e.target.value }))}
+                  title="Customer Email"
+                  placeholder="Enter customer email"
                 />
               </div>
             </div>
@@ -173,6 +180,8 @@ export const InvoiceForm = ({ invoice, onSave, onCancel }: InvoiceFormProps) => 
                     ...prev, 
                     customerAddress: { ...prev.customerAddress, street: e.target.value }
                   }))}
+                  title="Street Address"
+                  placeholder="Enter street address"
                 />
               </div>
               <div>
@@ -184,6 +193,8 @@ export const InvoiceForm = ({ invoice, onSave, onCancel }: InvoiceFormProps) => 
                     ...prev, 
                     customerAddress: { ...prev.customerAddress, city: e.target.value }
                   }))}
+                  title="City"
+                  placeholder="Enter city"
                 />
               </div>
               <div>
@@ -195,6 +206,8 @@ export const InvoiceForm = ({ invoice, onSave, onCancel }: InvoiceFormProps) => 
                     ...prev, 
                     customerAddress: { ...prev.customerAddress, state: e.target.value }
                   }))}
+                  title="State"
+                  placeholder="Enter state"
                 />
               </div>
             </div>
@@ -219,6 +232,7 @@ export const InvoiceForm = ({ invoice, onSave, onCancel }: InvoiceFormProps) => 
                       value={item.description}
                       onChange={(e) => updateItem(index, 'description', e.target.value)}
                       placeholder="Item description"
+                      title="Item Description"
                     />
                   </div>
                   <div className="col-span-2">
@@ -227,6 +241,8 @@ export const InvoiceForm = ({ invoice, onSave, onCancel }: InvoiceFormProps) => 
                       type="number"
                       value={item.quantity}
                       onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                      placeholder="Quantity"
+                      title="Quantity"
                     />
                   </div>
                   <div className="col-span-2">
@@ -236,6 +252,8 @@ export const InvoiceForm = ({ invoice, onSave, onCancel }: InvoiceFormProps) => 
                       step="0.01"
                       value={item.unitPrice}
                       onChange={(e) => updateItem(index, 'unitPrice', parseFloat(e.target.value) || 0)}
+                      placeholder="Unit price"
+                      title="Unit Price"
                     />
                   </div>
                   <div className="col-span-2">
@@ -251,6 +269,8 @@ export const InvoiceForm = ({ invoice, onSave, onCancel }: InvoiceFormProps) => 
                       checked={item.taxable}
                       onChange={(e) => updateItem(index, 'taxable', e.target.checked)}
                       className="mt-2"
+                      title="Taxable"
+                      aria-label="Taxable"
                     />
                   </div>
                   <div className="col-span-1">
@@ -294,6 +314,8 @@ export const InvoiceForm = ({ invoice, onSave, onCancel }: InvoiceFormProps) => 
                 id="terms"
                 value={formData.terms}
                 onChange={(e) => setFormData(prev => ({ ...prev, terms: e.target.value }))}
+                title="Payment Terms"
+                placeholder="Enter payment terms"
               />
             </div>
             <div>
@@ -304,6 +326,8 @@ export const InvoiceForm = ({ invoice, onSave, onCancel }: InvoiceFormProps) => 
                 step="0.1"
                 value={formData.taxRate}
                 onChange={(e) => setFormData(prev => ({ ...prev, taxRate: parseFloat(e.target.value) || 0 }))}
+                title="Tax Rate"
+                placeholder="Enter tax rate"
               />
             </div>
           </div>
@@ -315,6 +339,7 @@ export const InvoiceForm = ({ invoice, onSave, onCancel }: InvoiceFormProps) => 
               value={formData.notes}
               onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
               placeholder="Additional notes or terms..."
+              title="Notes"
             />
           </div>
 

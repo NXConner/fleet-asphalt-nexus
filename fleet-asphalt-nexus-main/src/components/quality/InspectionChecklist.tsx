@@ -21,7 +21,7 @@ export default function InspectionChecklist() {
         <ul className="mb-4">
           {items.map((c, i) => (
             <li key={c.id} className="flex items-center gap-2 mb-2">
-              <input type="checkbox" checked={c.checked} onChange={()=>setItems(items=>items.map((it,j)=>j===i?{...it,checked:!it.checked}:it))} />
+              <input type="checkbox" checked={c.checked} onChange={()=>setItems(items=>items.map((it,j)=>j===i?{...it,checked:!it.checked}:it))} title={c.item} aria-label={c.item} />
               {c.item}
             </li>
           ))}

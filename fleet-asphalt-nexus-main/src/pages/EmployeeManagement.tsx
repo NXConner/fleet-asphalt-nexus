@@ -216,6 +216,8 @@ export default function EmployeeManagement() {
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
               className="border rounded px-3 py-2"
+              title="Filter by employee status"
+              aria-label="Filter by employee status"
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,106 +9,8 @@ import { Plus, Search, Wrench, Calendar, AlertTriangle, Clock, DollarSign } from
 import { MaintenanceTask, MaintenanceSchedule } from "@/types/maintenance";
 
 const MaintenanceTracking = () => {
-  const [tasks] = useState<MaintenanceTask[]>([
-    {
-      id: "maint-001",
-      vehicleId: "vehicle-1",
-      type: "scheduled",
-      category: "engine",
-      title: "Oil Change Service",
-      description: "Routine oil change and filter replacement",
-      priority: "medium",
-      status: "scheduled",
-      scheduledDate: "2024-02-01T09:00:00Z",
-      estimatedCost: 150,
-      laborHours: 1,
-      parts: [
-        {
-          id: "part-001",
-          name: "Engine Oil",
-          partNumber: "EO-5W30-6Q",
-          quantity: 6,
-          unitCost: 8,
-          totalCost: 48,
-          supplier: "Auto Parts Plus"
-        },
-        {
-          id: "part-002",
-          name: "Oil Filter",
-          partNumber: "OF-HD-001",
-          quantity: 1,
-          unitCost: 15,
-          totalCost: 15,
-          supplier: "Auto Parts Plus"
-        }
-      ],
-      mileageAtService: 45000,
-      nextServiceMileage: 48000,
-      nextServiceDate: "2024-05-01T00:00:00Z",
-      photos: [],
-      documents: [],
-      notes: "Check for leaks after service",
-      createdAt: "2024-01-15T00:00:00Z",
-      updatedAt: "2024-01-15T00:00:00Z"
-    },
-    {
-      id: "maint-002",
-      vehicleId: "vehicle-2",
-      type: "repair",
-      category: "hydraulics",
-      title: "Hydraulic Pump Repair",
-      description: "Replace faulty hydraulic pump on paver",
-      priority: "high",
-      status: "in-progress",
-      scheduledDate: "2024-01-26T08:00:00Z",
-      estimatedCost: 2500,
-      actualCost: 2650,
-      laborHours: 8,
-      parts: [
-        {
-          id: "part-003",
-          name: "Hydraulic Pump",
-          partNumber: "HP-CAT-556",
-          quantity: 1,
-          unitCost: 1800,
-          totalCost: 1800,
-          supplier: "Caterpillar Parts"
-        }
-      ],
-      mechanicId: "mech-001",
-      shopId: "shop-001",
-      mileageAtService: 1250,
-      photos: [],
-      documents: [],
-      notes: "Pump failed due to contaminated fluid",
-      createdAt: "2024-01-20T00:00:00Z",
-      updatedAt: "2024-01-26T10:30:00Z"
-    }
-  ]);
-
-  const [schedules] = useState<MaintenanceSchedule[]>([
-    {
-      id: "sched-001",
-      vehicleId: "vehicle-1",
-      taskType: "Oil Change",
-      intervalType: "mileage",
-      intervalValue: 3000,
-      description: "Regular oil change service",
-      estimatedCost: 150,
-      isActive: true
-    },
-    {
-      id: "sched-002",
-      vehicleId: "vehicle-1",
-      taskType: "Brake Inspection",
-      intervalType: "time",
-      intervalValue: 6,
-      description: "Semi-annual brake system inspection",
-      estimatedCost: 200,
-      isActive: true
-    }
-  ]);
-
+  const [tasks, setTasks] = useState<MaintenanceTask[]>([]);
+  const [schedules, setSchedules] = useState<MaintenanceSchedule[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   const getPriorityColor = (priority: MaintenanceTask['priority']) => {

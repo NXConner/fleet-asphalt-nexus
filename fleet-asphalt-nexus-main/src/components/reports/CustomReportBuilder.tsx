@@ -26,7 +26,13 @@ export default function CustomReportBuilder() {
         </div>
         <div className="mb-4">
           <label className="mr-2">Schedule:</label>
-          <select value={schedule} onChange={e=>setSchedule(e.target.value)} className="border rounded p-1">
+          <select
+            value={schedule}
+            onChange={e=>setSchedule(e.target.value)}
+            className="border rounded p-1"
+            aria-label="Schedule"
+            title="Schedule"
+          >
             <option value="none">None</option>
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>

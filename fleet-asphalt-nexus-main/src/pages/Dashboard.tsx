@@ -16,14 +16,14 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, FileText, Users } from "lucide-react";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ARProjection from '../components/ui/ARProjection';
 import AchievementBadge from '../components/ui/AchievementBadge';
 import SafetyAlert from '../components/ui/SafetyAlert';
 import { useTheme } from '../components/ThemeProvider';
 import { SealcoatingSpreadsheetApp } from '../components/estimates/SealcoatingSpreadsheetApp';
 import { PopoutCalculator } from '../components/ui/PopoutCalculator';
-import { UnifiedMapInterface } from "@/components/UnifiedMapInterface";
+import UnifiedMapInterface from "@/components/UnifiedMapInterface";
 import AdvancedMapping from "./AdvancedMapping";
 import ThemeColorPicker from "@/components/ui/ThemeColorPicker";
 import PayrollDashboard from "@/components/payroll/PayrollDashboard";
@@ -39,6 +39,20 @@ const Dashboard = () => {
   const [arMode, setArMode] = useState(false);
   const [showSpreadsheet, setShowSpreadsheet] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
+  const [achievements, setAchievements] = useState([
+    { name: 'Pressure Washing Wizard', tier: 'gold', progress: 80, count: 40000 },
+    { name: 'Sealcoat Star', tier: 'silver', progress: 60, count: 12 },
+    { name: 'Crack Crusher', tier: 'bronze', progress: 25, count: 250 },
+    // ... more achievements
+  ]);
+  const [achievementNotification, setAchievementNotification] = useState<string|null>(null);
+
+  useEffect(() => {
+    // Example: notify when progress hits 100%
+    achievements.forEach(a => {
+      if (a.progress === 100) setAchievementNotification(`${a.name} unlocked!`);
+    });
+  }, [achievements]);
 
   if (isMobile) {
     return (
@@ -163,6 +177,7 @@ const Dashboard = () => {
             <TabsTrigger value="theme">Theme Customizer</TabsTrigger>
             <TabsTrigger value="payroll">Payroll</TabsTrigger>
             <TabsTrigger value="receipt-upload">Receipt Upload</TabsTrigger>
+            <TabsTrigger value="achievements">Achievements</TabsTrigger>
           </TabsList>
           
           <TabsContent value="enhanced" className="mt-6">
@@ -211,6 +226,19 @@ const Dashboard = () => {
 
           <TabsContent value="receipt-upload" className="mt-6">
             <ReceiptUpload />
+          </TabsContent>
+
+          <TabsContent value="achievements" className="mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
+              {achievements.map(a => (
+                <AchievementBadge key={a.name} name={a.name} tier={a.tier} progress={a.progress} count={a.count} />
+              ))}
+            </div>
+            {achievementNotification && (
+              <div className="mt-4 p-4 bg-green-100 text-green-800 rounded shadow">
+                {achievementNotification}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>

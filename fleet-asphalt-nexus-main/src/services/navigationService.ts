@@ -1,4 +1,3 @@
-
 export interface NavigationLink {
   path: string;
   label: string;
@@ -28,7 +27,8 @@ export class NavigationService {
             path: "/jobs",
             label: "Jobs",
             icon: "Briefcase",
-            description: "Manage active and scheduled jobs"
+            description: "Manage active and scheduled jobs",
+            badge: 3
           },
           {
             path: "/fleet",
@@ -69,7 +69,8 @@ export class NavigationService {
             path: "/invoices",
             label: "Invoices",
             icon: "FileText",
-            description: "Billing and invoice management"
+            description: "Billing and invoice management",
+            badge: 2
           },
           {
             path: "/crm",
@@ -92,7 +93,8 @@ export class NavigationService {
             path: "/maintenance",
             label: "Maintenance",
             icon: "Wrench",
-            description: "Equipment maintenance tracking"
+            description: "Equipment maintenance tracking",
+            badge: 1
           },
           {
             path: "/inventory",

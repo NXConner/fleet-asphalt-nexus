@@ -6,7 +6,7 @@ export default function QuickAdd() {
   const [value, setValue] = useState('');
   return (
     <div className="p-4 border rounded">
-      <select value={type} onChange={e=>setType(e.target.value)} className="border rounded p-1 mr-2">
+      <select value={type} onChange={e=>setType(e.target.value)} className="border rounded p-1 mr-2" title="Select type" aria-label="Select type">
         <option value="job">Job</option>
         <option value="customer">Customer</option>
         <option value="note">Note</option>

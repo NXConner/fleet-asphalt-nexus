@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -511,8 +510,8 @@ export default function EnhancedMaintenanceTracking() {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="vehicle_select">Select Vehicle</Label>
-                  <Select value={selectedVehicle} onValueChange={setSelectedVehicle}>
-                    <SelectTrigger>
+                  <Select value={selectedVehicle} onValueChange={setSelectedVehicle} title="Select vehicle" aria-label="Select vehicle">
+                    <SelectTrigger title="Vehicle" aria-label="Vehicle">
                       <SelectValue placeholder="Choose a vehicle" />
                     </SelectTrigger>
                     <SelectContent>

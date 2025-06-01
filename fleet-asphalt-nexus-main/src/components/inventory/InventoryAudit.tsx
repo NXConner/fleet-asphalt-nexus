@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -7,7 +7,7 @@ const initialAudit = [
   { id: 2, item: 'Asphalt Bag', code: '654321', status: 'Pending' },
 ];
 
-export default function InventoryAudit() {
+export function InventoryAudit() {
   const [audit, setAudit] = useState(initialAudit);
   const scan = () => {
     // Simulate scan
@@ -28,4 +28,6 @@ export default function InventoryAudit() {
       </CardContent>
     </Card>
   );
-} 
+}
+
+export default InventoryAudit; 

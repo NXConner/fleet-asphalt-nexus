@@ -3,14 +3,25 @@ import { useTheme } from '../ThemeProvider';
 import { Capacitor } from '@capacitor/core';
 
 interface ARProjectionProps {
-  type: 'measurement' | 'task' | 'alert';
+  type: 'measurement' | 'task' | 'alert' | 'compliance' | 'crack' | 'pci' | 'line' | 'geofence';
   content: string;
   position: { lat: number; lng: number };
+  region?: string;
+  tooltip?: string;
+  overlays?: Array<{
+    type: 'crack' | 'pci' | 'compliance';
+    content: string;
+    position: { lat: number; lng: number };
+    tooltip?: string;
+    compliant?: boolean;
+    pciScore?: number;
+  }>;
 }
 
 type Theme = 'asphalt-command' | 'light' | 'dark' | 'system';
 
-const ARProjection: React.FC<ARProjectionProps> = ({ type, content, position }) => {
+// NOTE: This is a placeholder for AR projection logic. Full AR implementation requires native plugins and is not yet implemented.
+const ARProjection: React.FC<ARProjectionProps> = ({ type, content, position, region, tooltip, overlays }) => {
   const { theme } = useTheme() as { theme: Theme };
   const projectionRef = useRef<HTMLDivElement>(null);
 
@@ -34,12 +45,37 @@ const ARProjection: React.FC<ARProjectionProps> = ({ type, content, position }) 
         ? 'ar-projection'
         : type === 'task'
         ? 'task-projection'
-        : 'alert-projection'
+        : type === 'alert'
+        ? 'alert-projection'
+        : type === 'compliance'
+        ? 'compliance-projection'
+        : type === 'crack'
+        ? 'crack-projection'
+        : type === 'pci'
+        ? 'pci-projection'
+        : type === 'line'
+        ? 'line-projection'
+        : type === 'geofence'
+        ? 'geofence-projection'
+        : ''
       : '';
 
   return (
-    <div ref={projectionRef} className={`absolute ${className}`}>
+    <div ref={projectionRef} className={`absolute ${className}`} title={tooltip || region}>
       {content}
+      {overlays && overlays.map((o, i) => (
+        <div
+          key={i}
+          className={`absolute ${o.type}-projection`}
+          style={{ left: o.position.lat, top: o.position.lng }}
+          title={o.tooltip}
+        >
+          {o.type === 'pci' && o.pciScore !== undefined ? `PCI: ${o.pciScore}` : o.content}
+          {o.type === 'compliance' && o.compliant !== undefined && (
+            <span className={`ml-2 ${o.compliant ? 'text-green-600' : 'text-red-600'}`}>{o.compliant ? 'Compliant' : 'Non-compliant'}</span>
+          )}
+        </div>
+      ))}
     </div>
   );
 };

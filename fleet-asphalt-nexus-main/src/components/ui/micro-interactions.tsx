@@ -1,6 +1,6 @@
-
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import styles from './MicroInteractions.module.css';
 
 interface HoverRevealProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'content'> {
   variant?: "slide" | "fade" | "scale" | "rotate" | "flip";
@@ -173,7 +173,7 @@ const RippleEffect = React.forwardRef<HTMLDivElement, RippleEffectProps>(
         {ripples.map(ripple => (
           <span
             key={ripple.id}
-            className="absolute pointer-events-none rounded-full animate-ping"
+            className={styles.ripple}
             style={{
               left: ripple.x - 4,
               top: ripple.y - 4,

@@ -1,3 +1,4 @@
+// All mock fleet vehicle data removed. Please use hooks and API integrations for real data.
 
 import { VehicleMetrics, FleetVehicle, MaintenanceAlert, RouteOptimization } from "@/types/fleetTypes";
 

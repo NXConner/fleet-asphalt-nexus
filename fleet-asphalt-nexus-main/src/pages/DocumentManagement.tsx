@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -207,6 +206,8 @@ const DocumentManagement = () => {
               className="px-3 py-2 border rounded-md"
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
+              title="Filter by document type"
+              aria-label="Filter by document type"
             >
               <option value="all">All Types</option>
               <option value="contract">Contracts</option>
@@ -239,6 +240,8 @@ const DocumentManagement = () => {
                   className="hidden" 
                   onChange={handleFileUpload}
                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                  title="Upload document file"
+                  placeholder="Choose file(s) to upload"
                 />
                 <Button 
                   onClick={() => document.getElementById('file-upload')?.click()}
