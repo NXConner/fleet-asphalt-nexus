@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,7 @@ import {
   Move
 } from "lucide-react";
 import CrackDetectionAR from './CrackDetectionAR';
+import { detectAsphaltAreas } from '@/services/mappingService';
 
 interface AsphaltArea {
   id: string;
@@ -44,45 +45,40 @@ export function AsphaltDetection({ onAreaSelect, showEmployeeTracking = false, h
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [complianceZones, setComplianceZones] = useState<{id: string, x: number, y: number, width: number, height: number, compliant: boolean, tooltip: string}[]>([]);
 
+  useEffect(() => {
+    const fetchDetection = async () => {
+      setIsDetecting(true);
+      try {
+        const res = await fetch('/api/detect-asphalt');
+        const geojson = await res.json();
+        // Convert GeoJSON to AsphaltArea[]
+        const areas = geojson.features.map((f: any, i: number) => ({
+          id: f.id || `asphalt-${i}`,
+          coordinates: f.geometry.coordinates[0].map(([lng, lat]: [number, number]) => ({ x: lng, y: lat })),
+          area: f.properties.area,
+          length: f.properties.length,
+          width: f.properties.width,
+          confidence: f.properties.confidence,
+          manuallyEdited: false,
+          pciScore: f.properties.pciScore,
+        }));
+        setDetectedAreas(areas);
+        setIsDetecting(false);
+        drawAreas(areas);
+      } catch (error) {
+        setIsDetecting(false);
+      }
+    };
+    fetchDetection();
+  }, []);
+
   const runAutoDetection = async () => {
     setIsDetecting(true);
     try {
-      // Simulate AI detection with mock data
-      setTimeout(() => {
-        const mockAreas: AsphaltArea[] = [
-          {
-            id: '1',
-            coordinates: [
-              {x: 100, y: 100},
-              {x: 300, y: 100},
-              {x: 300, y: 200},
-              {x: 100, y: 200}
-            ],
-            area: 4000,
-            length: 200,
-            width: 100,
-            confidence: 0.94,
-            manuallyEdited: false
-          },
-          {
-            id: '2',
-            coordinates: [
-              {x: 150, y: 250},
-              {x: 400, y: 250},
-              {x: 400, y: 350},
-              {x: 150, y: 350}
-            ],
-            area: 2500,
-            length: 250,
-            width: 100,
-            confidence: 0.87,
-            manuallyEdited: false
-          }
-        ];
-        setDetectedAreas(mockAreas);
-        setIsDetecting(false);
-        drawAreas(mockAreas);
-      }, 2000);
+      const areas = await detectAsphaltAreas();
+      setDetectedAreas(areas);
+      setIsDetecting(false);
+      drawAreas(areas);
     } catch (error) {
       console.error('Detection failed:', error);
       setIsDetecting(false);
@@ -160,21 +156,7 @@ export function AsphaltDetection({ onAreaSelect, showEmployeeTracking = false, h
 
     // Draw employee tracking if enabled
     if (showEmployeeTracking) {
-      const mockEmployees = [
-        {id: '1', name: 'John Doe', x: 250, y: 150, status: 'active'},
-        {id: '2', name: 'Jane Smith', x: 350, y: 300, status: 'break'}
-      ];
-
-      mockEmployees.forEach(emp => {
-        ctx.fillStyle = emp.status === 'active' ? '#22c55e' : '#f59e0b';
-        ctx.beginPath();
-        ctx.arc(emp.x, emp.y, 8, 0, 2 * Math.PI);
-        ctx.fill();
-        
-        ctx.fillStyle = '#000';
-        ctx.font = '10px Arial';
-        ctx.fillText(emp.name, emp.x - 20, emp.y - 12);
-      });
+      // TODO: Integrate real satellite imagery and live employee data.
     }
   }, [selectedArea, editMode, showEmployeeTracking, highlight]);
 
@@ -461,6 +443,9 @@ export function AsphaltDetection({ onAreaSelect, showEmployeeTracking = false, h
           title={zone.tooltip}
         />
       ))}
+
+      {/* TODO: Integrate ML-based auto-asphalt detection pipeline (API/model). */}
+      {/* Show user-facing message if not available. */}
     </div>
   );
 }
